@@ -70,6 +70,11 @@ class Character:
         max_mp: Integer, representing character Max MP stat pool
         ap: Integer, representing character free Ability Points (AP) pool
         sp: Integer, representing character free SP points pool
+        equipped_inv_id: Integer, representing the equipped inventory id
+        consume_inv_id: Integer, representing &#34;consume&#34; aka Use inventory id
+        etc_inv_id: Integer, representing etc inventory id
+        install_inv_id: Integer, representing install/setup inventory id
+        cash_inv_id: Integer, representing cash/nx inventory id
     &#34;&#34;&#34;
 
     def __init__(self, char_stats, database_config):
@@ -114,6 +119,14 @@ class Character:
         self._portal = 0
         self._sub_job = 0
         self.init_stats()
+
+        # These attributes are separate from characterstats table in database
+        self._equipped_inv_id = 0
+        self._consume_inv_id = 0
+        self._etc_inv_id = 0
+        self._install_inv_id = 0
+        self._cash_inv_id = 0
+        self.init_inv_id()
 
         self._user = self.init_user()
 
@@ -185,12 +198,36 @@ class Character:
             cursor.execute(f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;)
 
             user_stats = cursor.fetchall()[0]
+            database.disconnect()
             # The row will always be 0 because there should be no characters with the same name
             user = User(user_stats, self.database_config)
             return user
 
         except Exception as e:
             print(&#34;[ERROR] Error trying to retrieve User Data.&#34;, e)
+
+    def init_inv_id(self):
+        try:
+            host = self._database_config[&#34;host&#34;]
+            user = self._database_config[&#34;user&#34;]
+            password = self._database_config[&#34;password&#34;]
+            schema = self._database_config[&#34;schema&#34;]
+            port = self._database_config[&#34;port&#34;]
+
+            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+            cursor = database.cursor(dictionary=True)
+            cursor.execute(f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;)
+            inventory_ids = cursor.fetchall()[0]
+            database.disconnect()
+
+            self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
+            self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
+            self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
+            self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
+            self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+
+        except Exception as e:
+            print(&#34;[ERROR] Error trying to obtain assign inventory ids.&#34;, e)
 
     @property
     def database_config(self):
@@ -199,6 +236,10 @@ class Character:
     @property
     def stats(self):
         return self._stats
+
+    @property
+    def character_id(self):
+        return self._character_id
 
     @property
     def level(self):
@@ -500,6 +541,26 @@ class Character:
     @property
     def user(self):
         return self._user
+
+    @property
+    def equipped_inv_id(self):
+        return self._equipped_inv_id
+
+    @property
+    def consume_inv_id(self):
+        return self._consume_inv_id
+
+    @property
+    def etc_inv_id(self):
+        return self._etc_inv_id
+
+    @property
+    def install_inv_id(self):
+        return self._install_inv_id
+
+    @property
+    def cash_inv_id(self):
+        return self._cash_inv_id
 
     def get_user_id(self):
         &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
@@ -657,6 +718,16 @@ This class contains the appropriate getter and setter methods for said attribute
 <dd>Integer, representing character free Ability Points (AP) pool</dd>
 <dt><strong><code>sp</code></strong></dt>
 <dd>Integer, representing character free SP points pool</dd>
+<dt><strong><code>equipped_inv_id</code></strong></dt>
+<dd>Integer, representing the equipped inventory id</dd>
+<dt><strong><code>consume_inv_id</code></strong></dt>
+<dd>Integer, representing "consume" aka Use inventory id</dd>
+<dt><strong><code>etc_inv_id</code></strong></dt>
+<dd>Integer, representing etc inventory id</dd>
+<dt><strong><code>install_inv_id</code></strong></dt>
+<dd>Integer, representing install/setup inventory id</dd>
+<dt><strong><code>cash_inv_id</code></strong></dt>
+<dd>Integer, representing cash/nx inventory id</dd>
 </dl>
 <p>Emulates how character object is handled server-sided</p>
 <h2 id="args">Args</h2>
@@ -698,6 +769,11 @@ This class contains the appropriate getter and setter methods for said attribute
         max_mp: Integer, representing character Max MP stat pool
         ap: Integer, representing character free Ability Points (AP) pool
         sp: Integer, representing character free SP points pool
+        equipped_inv_id: Integer, representing the equipped inventory id
+        consume_inv_id: Integer, representing &#34;consume&#34; aka Use inventory id
+        etc_inv_id: Integer, representing etc inventory id
+        install_inv_id: Integer, representing install/setup inventory id
+        cash_inv_id: Integer, representing cash/nx inventory id
     &#34;&#34;&#34;
 
     def __init__(self, char_stats, database_config):
@@ -742,6 +818,14 @@ This class contains the appropriate getter and setter methods for said attribute
         self._portal = 0
         self._sub_job = 0
         self.init_stats()
+
+        # These attributes are separate from characterstats table in database
+        self._equipped_inv_id = 0
+        self._consume_inv_id = 0
+        self._etc_inv_id = 0
+        self._install_inv_id = 0
+        self._cash_inv_id = 0
+        self.init_inv_id()
 
         self._user = self.init_user()
 
@@ -813,12 +897,36 @@ This class contains the appropriate getter and setter methods for said attribute
             cursor.execute(f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;)
 
             user_stats = cursor.fetchall()[0]
+            database.disconnect()
             # The row will always be 0 because there should be no characters with the same name
             user = User(user_stats, self.database_config)
             return user
 
         except Exception as e:
             print(&#34;[ERROR] Error trying to retrieve User Data.&#34;, e)
+
+    def init_inv_id(self):
+        try:
+            host = self._database_config[&#34;host&#34;]
+            user = self._database_config[&#34;user&#34;]
+            password = self._database_config[&#34;password&#34;]
+            schema = self._database_config[&#34;schema&#34;]
+            port = self._database_config[&#34;port&#34;]
+
+            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+            cursor = database.cursor(dictionary=True)
+            cursor.execute(f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;)
+            inventory_ids = cursor.fetchall()[0]
+            database.disconnect()
+
+            self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
+            self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
+            self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
+            self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
+            self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+
+        except Exception as e:
+            print(&#34;[ERROR] Error trying to obtain assign inventory ids.&#34;, e)
 
     @property
     def database_config(self):
@@ -827,6 +935,10 @@ This class contains the appropriate getter and setter methods for said attribute
     @property
     def stats(self):
         return self._stats
+
+    @property
+    def character_id(self):
+        return self._character_id
 
     @property
     def level(self):
@@ -1129,6 +1241,26 @@ This class contains the appropriate getter and setter methods for said attribute
     def user(self):
         return self._user
 
+    @property
+    def equipped_inv_id(self):
+        return self._equipped_inv_id
+
+    @property
+    def consume_inv_id(self):
+        return self._consume_inv_id
+
+    @property
+    def etc_inv_id(self):
+        return self._etc_inv_id
+
+    @property
+    def install_inv_id(self):
+        return self._install_inv_id
+
+    @property
+    def cash_inv_id(self):
+        return self._cash_inv_id
+
     def get_user_id(self):
         &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
 
@@ -1238,6 +1370,42 @@ def ap(self):
     return self._ap</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.character.Character.cash_inv_id"><code class="name">var <span class="ident">cash_inv_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def cash_inv_id(self):
+    return self._cash_inv_id</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.character_id"><code class="name">var <span class="ident">character_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def character_id(self):
+    return self._character_id</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.consume_inv_id"><code class="name">var <span class="ident">consume_inv_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def consume_inv_id(self):
+    return self._consume_inv_id</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.character.Character.database_config"><code class="name">var <span class="ident">database_config</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -1260,6 +1428,30 @@ def database_config(self):
 <pre><code class="python">@property
 def dex(self):
     return self._dex</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.equipped_inv_id"><code class="name">var <span class="ident">equipped_inv_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def equipped_inv_id(self):
+    return self._equipped_inv_id</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.etc_inv_id"><code class="name">var <span class="ident">etc_inv_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def etc_inv_id(self):
+    return self._etc_inv_id</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.exp"><code class="name">var <span class="ident">exp</span></code></dt>
@@ -1308,6 +1500,18 @@ def fame(self):
 <pre><code class="python">@property
 def hair(self):
     return self._hair</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.install_inv_id"><code class="name">var <span class="ident">install_inv_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def install_inv_id(self):
+    return self._install_inv_id</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.inte"><code class="name">var <span class="ident">inte</span></code></dt>
@@ -1904,6 +2108,39 @@ Returns None if User ID is not found</p>
         return None  # Return None if there was an error</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.character.Character.init_inv_id"><code class="name flex">
+<span>def <span class="ident">init_inv_id</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_inv_id(self):
+    try:
+        host = self._database_config[&#34;host&#34;]
+        user = self._database_config[&#34;user&#34;]
+        password = self._database_config[&#34;password&#34;]
+        schema = self._database_config[&#34;schema&#34;]
+        port = self._database_config[&#34;port&#34;]
+
+        database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+        cursor = database.cursor(dictionary=True)
+        cursor.execute(f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;)
+        inventory_ids = cursor.fetchall()[0]
+        database.disconnect()
+
+        self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
+        self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
+        self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
+        self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
+        self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+
+    except Exception as e:
+        print(&#34;[ERROR] Error trying to obtain assign inventory ids.&#34;, e)</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.character.Character.init_stats"><code class="name flex">
 <span>def <span class="ident">init_stats</span></span>(<span>self)</span>
 </code></dt>
@@ -2001,6 +2238,7 @@ a new User object instance, with the relevant user attributes from the database.
         cursor.execute(f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;)
 
         user_stats = cursor.fetchall()[0]
+        database.disconnect()
         # The row will always be 0 because there should be no characters with the same name
         user = User(user_stats, self.database_config)
         return user
@@ -2116,8 +2354,13 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.add_sp" href="#swordie_db.character.Character.add_sp">add_sp</a></code></li>
 <li><code><a title="swordie_db.character.Character.add_str" href="#swordie_db.character.Character.add_str">add_str</a></code></li>
 <li><code><a title="swordie_db.character.Character.ap" href="#swordie_db.character.Character.ap">ap</a></code></li>
+<li><code><a title="swordie_db.character.Character.cash_inv_id" href="#swordie_db.character.Character.cash_inv_id">cash_inv_id</a></code></li>
+<li><code><a title="swordie_db.character.Character.character_id" href="#swordie_db.character.Character.character_id">character_id</a></code></li>
+<li><code><a title="swordie_db.character.Character.consume_inv_id" href="#swordie_db.character.Character.consume_inv_id">consume_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.database_config" href="#swordie_db.character.Character.database_config">database_config</a></code></li>
 <li><code><a title="swordie_db.character.Character.dex" href="#swordie_db.character.Character.dex">dex</a></code></li>
+<li><code><a title="swordie_db.character.Character.equipped_inv_id" href="#swordie_db.character.Character.equipped_inv_id">equipped_inv_id</a></code></li>
+<li><code><a title="swordie_db.character.Character.etc_inv_id" href="#swordie_db.character.Character.etc_inv_id">etc_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.exp" href="#swordie_db.character.Character.exp">exp</a></code></li>
 <li><code><a title="swordie_db.character.Character.face" href="#swordie_db.character.Character.face">face</a></code></li>
 <li><code><a title="swordie_db.character.Character.fame" href="#swordie_db.character.Character.fame">fame</a></code></li>
@@ -2126,8 +2369,10 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.get_stat_by_column" href="#swordie_db.character.Character.get_stat_by_column">get_stat_by_column</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_user_id" href="#swordie_db.character.Character.get_user_id">get_user_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.hair" href="#swordie_db.character.Character.hair">hair</a></code></li>
+<li><code><a title="swordie_db.character.Character.init_inv_id" href="#swordie_db.character.Character.init_inv_id">init_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.init_stats" href="#swordie_db.character.Character.init_stats">init_stats</a></code></li>
 <li><code><a title="swordie_db.character.Character.init_user" href="#swordie_db.character.Character.init_user">init_user</a></code></li>
+<li><code><a title="swordie_db.character.Character.install_inv_id" href="#swordie_db.character.Character.install_inv_id">install_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.inte" href="#swordie_db.character.Character.inte">inte</a></code></li>
 <li><code><a title="swordie_db.character.Character.job" href="#swordie_db.character.Character.job">job</a></code></li>
 <li><code><a title="swordie_db.character.Character.level" href="#swordie_db.character.Character.level">level</a></code></li>

@@ -52,6 +52,7 @@ class User:
         ban_reason: String (256 Char), representing the reason the user is banned
         donation_points: Integer, representing the amount of DP the user has
         maple_points: Integer, representing the amount of Maple Points the user has
+        nx_prepaid: Integer, representing the amoung of NX Prepaid the user has
         user_id: Integer, representing the User ID
         vote_points: Integer, representing the amount of VP the user has
     &#34;&#34;&#34;
@@ -72,6 +73,7 @@ class User:
         self._vote_points = 0
         self._donation_points = 0
         self._maple_points = 0
+        self._nx_prepaid = 0
         self._account_type = 0
         self.init_user_stats()
 
@@ -87,6 +89,7 @@ class User:
         self._vote_points = self._user_stats[&#34;votepoints&#34;]
         self._donation_points = self._user_stats[&#34;donationpoints&#34;]
         self._maple_points = self._user_stats[&#34;maplePoints&#34;]
+        self._nx_prepaid = self._user_stats[&#34;nxPrepaid&#34;]
         self._account_type = self._user_stats[&#34;accounttype&#34;]
 
     @property
@@ -230,6 +233,24 @@ class User:
         elif self.account_type == 5:
             return &#34;Tester&#34;
 
+    @property
+    def nx_prepaid(self):
+        return self._nx_prepaid
+
+    @nx_prepaid.setter
+    def nx_prepaid(self, amount):
+        self.set_stat_by_column(&#34;nxPrepaid&#34;, amount)
+        self._nx_prepaid = amount
+
+    def add_nx_prepaid(self, amount):
+        &#34;&#34;&#34;Adds the specified amount to the current NX pool
+
+        Args:
+            amount: Int, representing the amount of NX to be added to the NX pool
+        &#34;&#34;&#34;
+        new_nx = int(amount) + self.nx_prepaid
+        self.nx_prepaid = new_nx
+
     def get_stat_by_column(self, column):
         &#34;&#34;&#34;Fetches user attribute by column name
 
@@ -249,7 +270,7 @@ class User:
         Grabs the database attributes provided through the class constructor.
         Uses these attributes to attempt a database connection.
         Attempts to update the field represented by the provided column in the users table, with the provided value.
-        Not recommended to use this alone, as it won&#39;t update the character object which this was used from
+        Not recommended to use this alone, as it won&#39;t update the user object which this was used from
 
         Args:
             value: int or string, representing the value to be set in the database
@@ -313,6 +334,8 @@ This class contains the appropriate getter and setter methods for said attribute
 <dd>Integer, representing the amount of DP the user has</dd>
 <dt><strong><code>maple_points</code></strong></dt>
 <dd>Integer, representing the amount of Maple Points the user has</dd>
+<dt><strong><code>nx_prepaid</code></strong></dt>
+<dd>Integer, representing the amoung of NX Prepaid the user has</dd>
 <dt><strong><code>user_id</code></strong></dt>
 <dd>Integer, representing the User ID</dd>
 <dt><strong><code>vote_points</code></strong></dt>
@@ -343,6 +366,7 @@ This class contains the appropriate getter and setter methods for said attribute
         ban_reason: String (256 Char), representing the reason the user is banned
         donation_points: Integer, representing the amount of DP the user has
         maple_points: Integer, representing the amount of Maple Points the user has
+        nx_prepaid: Integer, representing the amoung of NX Prepaid the user has
         user_id: Integer, representing the User ID
         vote_points: Integer, representing the amount of VP the user has
     &#34;&#34;&#34;
@@ -363,6 +387,7 @@ This class contains the appropriate getter and setter methods for said attribute
         self._vote_points = 0
         self._donation_points = 0
         self._maple_points = 0
+        self._nx_prepaid = 0
         self._account_type = 0
         self.init_user_stats()
 
@@ -378,6 +403,7 @@ This class contains the appropriate getter and setter methods for said attribute
         self._vote_points = self._user_stats[&#34;votepoints&#34;]
         self._donation_points = self._user_stats[&#34;donationpoints&#34;]
         self._maple_points = self._user_stats[&#34;maplePoints&#34;]
+        self._nx_prepaid = self._user_stats[&#34;nxPrepaid&#34;]
         self._account_type = self._user_stats[&#34;accounttype&#34;]
 
     @property
@@ -521,6 +547,24 @@ This class contains the appropriate getter and setter methods for said attribute
         elif self.account_type == 5:
             return &#34;Tester&#34;
 
+    @property
+    def nx_prepaid(self):
+        return self._nx_prepaid
+
+    @nx_prepaid.setter
+    def nx_prepaid(self, amount):
+        self.set_stat_by_column(&#34;nxPrepaid&#34;, amount)
+        self._nx_prepaid = amount
+
+    def add_nx_prepaid(self, amount):
+        &#34;&#34;&#34;Adds the specified amount to the current NX pool
+
+        Args:
+            amount: Int, representing the amount of NX to be added to the NX pool
+        &#34;&#34;&#34;
+        new_nx = int(amount) + self.nx_prepaid
+        self.nx_prepaid = new_nx
+
     def get_stat_by_column(self, column):
         &#34;&#34;&#34;Fetches user attribute by column name
 
@@ -540,7 +584,7 @@ This class contains the appropriate getter and setter methods for said attribute
         Grabs the database attributes provided through the class constructor.
         Uses these attributes to attempt a database connection.
         Attempts to update the field represented by the provided column in the users table, with the provided value.
-        Not recommended to use this alone, as it won&#39;t update the character object which this was used from
+        Not recommended to use this alone, as it won&#39;t update the user object which this was used from
 
         Args:
             value: int or string, representing the value to be set in the database
@@ -636,6 +680,18 @@ def maple_points(self):
     return self._maple_points</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.user.User.nx_prepaid"><code class="name">var <span class="ident">nx_prepaid</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nx_prepaid(self):
+    return self._nx_prepaid</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.user.User.user_id"><code class="name">var <span class="ident">user_id</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -721,6 +777,30 @@ def vote_points(self):
     &#34;&#34;&#34;
     new_maple_points = int(amount) + self.maple_points
     self.maple_points = new_maple_points</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.user.User.add_nx_prepaid"><code class="name flex">
+<span>def <span class="ident">add_nx_prepaid</span></span>(<span>self, amount)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds the specified amount to the current NX pool</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>amount</code></strong></dt>
+<dd>Int, representing the amount of NX to be added to the NX pool</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_nx_prepaid(self, amount):
+    &#34;&#34;&#34;Adds the specified amount to the current NX pool
+
+    Args:
+        amount: Int, representing the amount of NX to be added to the NX pool
+    &#34;&#34;&#34;
+    new_nx = int(amount) + self.nx_prepaid
+    self.nx_prepaid = new_nx</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.user.User.add_vote_points"><code class="name flex">
@@ -912,6 +992,7 @@ the User object instance.</p></div>
     self._vote_points = self._user_stats[&#34;votepoints&#34;]
     self._donation_points = self._user_stats[&#34;donationpoints&#34;]
     self._maple_points = self._user_stats[&#34;maplePoints&#34;]
+    self._nx_prepaid = self._user_stats[&#34;nxPrepaid&#34;]
     self._account_type = self._user_stats[&#34;accounttype&#34;]</code></pre>
 </details>
 </dd>
@@ -946,7 +1027,7 @@ the User object instance.</p></div>
 <p>Grabs the database attributes provided through the class constructor.
 Uses these attributes to attempt a database connection.
 Attempts to update the field represented by the provided column in the users table, with the provided value.
-Not recommended to use this alone, as it won't update the character object which this was used from</p>
+Not recommended to use this alone, as it won't update the user object which this was used from</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>value</code></strong></dt>
@@ -975,7 +1056,7 @@ Not recommended to use this alone, as it won't update the character object which
     Grabs the database attributes provided through the class constructor.
     Uses these attributes to attempt a database connection.
     Attempts to update the field represented by the provided column in the users table, with the provided value.
-    Not recommended to use this alone, as it won&#39;t update the character object which this was used from
+    Not recommended to use this alone, as it won&#39;t update the user object which this was used from
 
     Args:
         value: int or string, representing the value to be set in the database
@@ -1034,6 +1115,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.user.User.account_type" href="#swordie_db.user.User.account_type">account_type</a></code></li>
 <li><code><a title="swordie_db.user.User.add_donation_points" href="#swordie_db.user.User.add_donation_points">add_donation_points</a></code></li>
 <li><code><a title="swordie_db.user.User.add_maple_points" href="#swordie_db.user.User.add_maple_points">add_maple_points</a></code></li>
+<li><code><a title="swordie_db.user.User.add_nx_prepaid" href="#swordie_db.user.User.add_nx_prepaid">add_nx_prepaid</a></code></li>
 <li><code><a title="swordie_db.user.User.add_vote_points" href="#swordie_db.user.User.add_vote_points">add_vote_points</a></code></li>
 <li><code><a title="swordie_db.user.User.ban_reason" href="#swordie_db.user.User.ban_reason">ban_reason</a></code></li>
 <li><code><a title="swordie_db.user.User.change_password" href="#swordie_db.user.User.change_password">change_password</a></code></li>
@@ -1048,6 +1130,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.user.User.init_user_stats" href="#swordie_db.user.User.init_user_stats">init_user_stats</a></code></li>
 <li><code><a title="swordie_db.user.User.is_admin" href="#swordie_db.user.User.is_admin">is_admin</a></code></li>
 <li><code><a title="swordie_db.user.User.maple_points" href="#swordie_db.user.User.maple_points">maple_points</a></code></li>
+<li><code><a title="swordie_db.user.User.nx_prepaid" href="#swordie_db.user.User.nx_prepaid">nx_prepaid</a></code></li>
 <li><code><a title="swordie_db.user.User.set_stat_by_column" href="#swordie_db.user.User.set_stat_by_column">set_stat_by_column</a></code></li>
 <li><code><a title="swordie_db.user.User.user_id" href="#swordie_db.user.User.user_id">user_id</a></code></li>
 <li><code><a title="swordie_db.user.User.user_stats" href="#swordie_db.user.User.user_stats">user_stats</a></code></li>
