@@ -82,10 +82,6 @@ def test_acc_type_changes(user, admin, intern, tester, player):
 	# Setting of account type by convenience functions
 	user.give_player()
 	assert user.account_type == player, f"Error encountered whilst setting account type with functions: \nExpected: {player} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
-	user.give_tester()
-	assert user.account_type == tester, f"Error encountered whilst setting account type with functions: \nExpected: {tester} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
-	user.give_intern()
-	assert user.account_type == intern, f"Error encountered whilst setting account type with functions: \nExpected: {intern} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
 	user.give_admin()
 	assert user.account_type == admin, f"Error encountered whilst setting account type with functions: \nExpected: {admin} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
 	assert user.is_admin(), f"Error encountered whilst checking account type: \nExpected: True (Bool); Encountered: {user.is_admin}"
@@ -108,7 +104,7 @@ def test_dp_changes(user, before, delta, expected):
 def test_maple_points_changes(user, before, delta, expected):
 	user.maple_points = before
 	assert user.maple_points == before, f"Error encountered whilst setting Maple Points: \nExpected: {before} (String); Encountered: {user.maple_points}, Type: {type(user.maple_points)}"
-	user.maple_points(delta)
+	user.add_maple_points(delta)
 	assert user.maple_points == expected, f"Error encountered whilst setting Maple Points: \nExpected: {expected} (String); Encountered: {user.maple_points}, Type: {type(user.maple_points)}"
 	user.maple_points = 0
 
@@ -118,6 +114,6 @@ def test_maple_points_changes(user, before, delta, expected):
 def test_vp_changes(user, before, delta, expected):
 	user.vote_points = before
 	assert user.vote_points == before, f"Error encountered whilst setting VP count: \nExpected: {before} (String); Encountered: {user.vote_points}, Type: {type(user.vote_points)}"
-	user.vote_points(delta)
+	user.add_vote_points(delta)
 	assert user.vote_points == expected, f"Error encountered whilst setting VP count: \nExpected: {expected} (String); Encountered: {user.vote_points}, Type: {type(user.vote_points)}"
 	user.vote_points = 0

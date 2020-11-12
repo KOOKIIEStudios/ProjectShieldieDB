@@ -3,7 +3,7 @@ INSERT INTO `users` (id, banReason, votepoints, donationpoints, maplePoints, nxP
 `name`, `password`, accounttype, chatunblockdate, pic, characterslots)
 VALUES (90001, 'Lorem Ipsum', 0, 0, 0, 0, 0, 3, 
 'tester', 'lorem', 4, 0, '111111', 40)
-ON DUPLICATE KEY UPDATE votepoints=0, donationpoints=0, maplePoints=0, nxPrepaid=0, nblockreason=0, pblockreason=3, 
+ON DUPLICATE KEY UPDATE banReason='Lorem Ipsum', votepoints=0, donationpoints=0, maplePoints=0, nxPrepaid=0, nblockreason=0, pblockreason=3, 
 `name`='tester', `password`='lorem', accounttype=4, chatunblockdate=0, pic='111111';
 
 -- Create admin tester account with Account ID of 90,001, Trunk ID of 90,001, and no NX
