@@ -37,6 +37,9 @@ def user():
 def test_fetch_acc_type(user):
 	assert user.account_type == 4, f"Error encountered whilst fetching account type: \nExpected: 4 (Int); Encountered: {user.account_type}, Type: {type(user.account_type)}"
 
+def test_acc_str(user):
+	assert user.get_acc_type_string() == "Admin", f"Error encountered whilst fetching account type string: \nExpected: \"Admin\" (String); Encountered: {user.get_acc_type_string()}, Type: {type(user.get_acc_type_string())}"
+
 def test_fetch_ban_reason(user):
 	assert user.ban_reason == "Lorem Ipsum", f"Error encountered whilst fetching ban reason: \nExpected: \"Lorem Ipsum\" (String); Encountered: {user.ban_reason}, Type: {type(user.ban_reason)}"
 
@@ -56,12 +59,65 @@ def test_fetch_vote_points(user):
 # def test_fetch_nx(user):
 # 	 assert user.nx == 0, f"Error encountered whilst fetching NX: \nExpected: 0 (Int); Encountered: {user.nx}, Type: {type(user.nx)}"
 
+def test_fetch_stat_by_column(user):
+	assert user.get_stat_by_column("gender") == 0, f"Error encountered whilst fetching gender: \nExpected: 0 (Int); Encountered: {user.get_stat_by_column('gender')}, Type: {type(user.get_stat_by_column('gender'))}"
+
 # User info setting tests
 @pytest.mark.parametrize("before, expected",[
 	("Lorem Ipsum", "dolor sit amet"),
 ])
-def test_ban_reason_changes(user, before, delta, expected):
+def test_ban_reason_changes(user, before, expected):
 	user.ban_reason = expected
-	assert  user.ban_reason == expected, f"Error encountered whilst setting ban reason: \nExpected: {expected} (String); Encountered: {user.ban_reason}, Type: {type(user.ban_reason)}"
+	assert user.ban_reason == expected, f"Error encountered whilst setting ban reason: \nExpected: {expected} (String); Encountered: {user.ban_reason}, Type: {type(user.ban_reason)}"
 
+# User info setting tests
+@pytest.mark.parametrize("admin, intern, tester, player",[
+	(4, 3, 5, 0),
+])
+def test_acc_type_changes(user, admin, intern, tester, player):
+	# Directly set account type via property
+	user.account_type = intern
+	assert user.account_type == intern, f"Error encountered whilst directly setting account type: \nExpected: {intern} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
+	assert not user.is_admin(), f"Error encountered whilst checking account type: \nExpected: False (Bool); Encountered: {user.is_admin}"
+	# Setting of account type by convenience functions
+	user.give_player()
+	assert user.account_type == player, f"Error encountered whilst setting account type with functions: \nExpected: {player} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
+	user.give_tester()
+	assert user.account_type == tester, f"Error encountered whilst setting account type with functions: \nExpected: {tester} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
+	user.give_intern()
+	assert user.account_type == intern, f"Error encountered whilst setting account type with functions: \nExpected: {intern} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
+	user.give_admin()
+	assert user.account_type == admin, f"Error encountered whilst setting account type with functions: \nExpected: {admin} (String); Encountered: {user.account_type}, Type: {type(user.account_type)}"
+	assert user.is_admin(), f"Error encountered whilst checking account type: \nExpected: True (Bool); Encountered: {user.is_admin}"
 
+# Password change function omitted from checks - insecure function! Deprecated!
+
+@pytest.mark.parametrize("before, delta, expected",[
+	(314159, 2827433, 3141592),
+])
+def test_dp_changes(user, before, delta, expected):
+	user.donation_points = before
+	assert user.donation_points == before, f"Error encountered whilst setting DP count: \nExpected: {before} (String); Encountered: {user.donation_points}, Type: {type(user.donation_points)}"
+	user.add_donation_points(delta)
+	assert user.donation_points == expected, f"Error encountered whilst setting DP count: \nExpected: {expected} (String); Encountered: {user.donation_points}, Type: {type(user.donation_points)}"
+	user.donation_points = 0
+
+@pytest.mark.parametrize("before, delta, expected",[
+	(314159, 2827433, 3141592),
+])
+def test_maple_points_changes(user, before, delta, expected):
+	user.maple_points = before
+	assert user.maple_points == before, f"Error encountered whilst setting Maple Points: \nExpected: {before} (String); Encountered: {user.maple_points}, Type: {type(user.maple_points)}"
+	user.maple_points(delta)
+	assert user.maple_points == expected, f"Error encountered whilst setting Maple Points: \nExpected: {expected} (String); Encountered: {user.maple_points}, Type: {type(user.maple_points)}"
+	user.maple_points = 0
+
+@pytest.mark.parametrize("before, delta, expected",[
+	(314159, 2827433, 3141592),
+])
+def test_vp_changes(user, before, delta, expected):
+	user.vote_points = before
+	assert user.vote_points == before, f"Error encountered whilst setting VP count: \nExpected: {before} (String); Encountered: {user.vote_points}, Type: {type(user.vote_points)}"
+	user.vote_points(delta)
+	assert user.vote_points == expected, f"Error encountered whilst setting VP count: \nExpected: {expected} (String); Encountered: {user.vote_points}, Type: {type(user.vote_points)}"
+	user.vote_points = 0
