@@ -1,4 +1,4 @@
-"""This is a unit test for checking basic functionality
+"""This is a unit test for checking basic Character handling functionality
 
 NOTE: This script needs to be in the same directory as the swordie_db module.
 This can be run directly for a quick test of functionality (alter DB attributes prior to use).
@@ -44,32 +44,70 @@ def user_id():
 	return user_ID
 
 # Character info fetching tests
-def test_fetch_char_info(char):
+def test_fetch_char_name(char):
 	assert char.name == "tester", f"Critical Error: Name test failed! Name: {char.name}; Type: {type(char.name)}"
+
+def test_fetch_char_mesos(char):
 	assert char.money == "0", f"Meso test failed! Meso count: {char.money}; Type: {type(char.money)}"
+
+def test_fetch_char_fame(char):
 	assert char.fame == 0, f"Fame test failed! Fame count: {char.fame}; Type: {type(char.fame)}"
+
+def test_fetch_char_class_name(char):
 	job = char.get_job_name()  # return job name from ID via Hashmap; String
 	assert job == "Beginner", f"Job name test failed! Job name: {job}; Type: {type(job)}"
+
+def test_fetch_char_class_id(char):
 	assert char.job == 0, f"Job ID test failed! Job ID: {char.job}; Type: {type(char.job)}"
+
+def test_fetch_char_info(char):
 	assert char.level == 1, f"Character level test failed! Level count: {char.level}; Type: {type(char.level)}"
+
+def test_fetch_char_honour(char):
 	honor_exp = char.get_stat_by_column("honorexp")  # Int
 	assert honor_exp == 0, f"Honour EXP test failed! Honour count: {honor_exp}; Type: {type(honor_exp)}"
 
+def test_fetch_char_map(char):
 	assert char.map == "4000011", f"Map ID test failed! Map ID: {char.map}; Type: {type(char.map)}"
+
+def test_fetch_char_face(char):
 	assert char.face == 23300, f"Face ID test failed! Face ID: {char.face}; Type: {type(char.face)}"
+
+def test_fetch_char_hair(char):
 	assert char.hair == 36786, f"Hair ID test failed! Hair ID: {char.hair}; Type: {type(char.hair)}"
+
+def test_fetch_char_skin(char):
 	assert char.skin == 0, f"Skin ID test failed! Skin ID: {char.skin}; Type: {type(char.skin)}"
+
+def test_fetch_char_exp(char):
 	assert char.exp == "0", f"EXP test failed! EXP amount: {char.exp}; Type: {type(char.exp)}"
 
+def test_fetch_char_str(char):
 	assert char.strength == 12, f"STR test failed! STR amount: {char.strength}; Type: {type(char.strength)}"
+
+def test_fetch_char_dex(char):
 	assert char.dex == 5, f"DEX test failed! DEX amount: {char.dex}; Type: {type(char.dex)}"
+
+def test_fetch_char_int(char):
 	assert char.inte == 4, f"INT test failed! INT amount: {char.inte}; Type: {type(char.inte)}"
+
+def test_fetch_char_luk(char):
 	assert char.luk == 4, f"LUK test failed! LUK amount: {char.luk}; Type: {type(char.luk)}"
+
+def test_fetch_char_pri_stats(char):
 	primary_stats = char.get_primary_stats()  # returns a dictionary of the 4 main stats; dictionary
 	assert primary_stats == {'str': 12, 'dex': 5, 'int': 4, 'luk': 4}, f"Primary Stats test failed! \nExpected: {{'str': 12, 'dex': 5, 'int': 4, 'luk': 4}} \nEncountered: {primary_stats}"
+
+def test_fetch_char_hp(char):
 	assert char.max_hp == 50, f"HP test failed! HP amount: {char.max_hp}; Type: {type(char.max_hp)}"
+
+def test_fetch_char_mp(char):
 	assert char.max_mp == 0, f"MP test failed! MP amount: {char.max_mp}; Type: {type(char.max_mp)}"
+
+def test_fetch_char_ap(char):
 	assert char.ap == 0, f"AP test failed! AP amount: {char.ap}; Type: {type(char.ap)}"
+
+def test_fetch_char_sp(char):
 	assert char.sp == 0, f"SP test failed! SP amount: {char.sp}; Type: {type(char.sp)}"
 
 def test_fetch_user_id(user_id):
