@@ -206,41 +206,42 @@ def test_luk_changes(char, before, delta, expected):
 	assert char.luk == expected, f"LUK adding test failed! Expected: {expected}; LUK amount: {char.luk}; Type: {type(char.luk)}"
 	char.luk = 4  # reset to baseline
 
-print("\nChecking the ability to write the following information to DB: ")
-print("    > HP; MP; AP; SP. \n")
-# Set values for HP, MP, AP, SP
-char.max_hp = 31
-char.max_mp = 31
-char.ap = 31
-char.sp = 31
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_hp_changes(char, before, delta, expected):
+	char.max_hp = before
+	assert char.max_hp == before, f"HP setting test failed! Expected: {before}; HP amount: {char.max_hp}; Type: {type(char.max_hp)}"
+	char.add_max_hp(delta)
+	assert char.max_hp == expected, f"HP adding test failed! Expected: {expected}; HP amount: {char.max_hp}; Type: {type(char.max_hp)}"
+	char.max_hp = 50  # reset to baseline
 
-hp = char.max_hp  # re-fetch data
-assert hp == 31, f"HP setting test failed! Expected: {before}; HP amount: {hp}; Type: {type(hp)}"
-char.add_max_hp(1)
-hp = char.max_hp  # re-fetch data
-assert hp == 32, f"HP adding test failed! Expected: {expected}; HP amount: {hp}; Type: {type(hp)}"
-char.max_hp = 50  # reset to baseline
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_mp_changes(char, before, delta, expected):
+	char.max_mp = before
+	assert char.max_mp == before, f"MP setting test failed! Expected: {before}; MP amount: {char.max_mp}; Type: {type(char.max_mp)}"
+	char.add_max_mp(delta)
+	assert char.max_mp == expected, f"MP adding test failed! Expected: {expected}; MP amount: {char.max_mp}; Type: {type(char.max_mp)}"
+	char.max_mp = 0  # reset to baseline
 
-mp = char.max_mp  # re-fetch data
-assert mp == 31, f"MP setting test failed! Expected: {before}; MP amount: {mp}; Type: {type(mp)}"
-char.add_max_mp(1)
-mp = char.max_mp  # re-fetch data
-assert mp == 32, f"MP adding test failed! Expected: {expected}; MP amount: {mp}; Type: {type(mp)}"
-char.max_mp = 0  # reset to baseline
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_ap_changes(char, before, delta, expected):
+	char.ap = before
+	assert char.ap == before, f"AP setting test failed! Expected: {before}; AP amount: {char.ap}; Type: {type(char.ap)}"
+	char.add_ap(delta)
+	assert char.ap == expected, f"AP adding test failed! Expected: {expected}; AP amount: {char.ap}; Type: {type(char.ap)}"
+	char.ap = 0  # reset to baseline
 
-ap = char.ap  # re-fetch data
-assert ap == 31, f"AP setting test failed! Expected: {before}; AP amount: {ap}; Type: {type(ap)}"
-char.add_ap(1)
-ap = char.ap  # re-fetch data
-assert ap == 32, f"AP adding test failed! Expected: {expected}; AP amount: {ap}; Type: {type(ap)}"
-char.ap = 0  # reset to baseline
-
-sp = char.sp  # re-fetch data
-assert sp == 31, f"SP setting test failed! Expected: {before}; SP amount: {sp}; Type: {type(sp)}"
-char.add_sp(1)
-sp = char.sp  # re-fetch data
-assert sp == 32, f"SP adding test failed! Expected: {expected}; SP amount: {sp}; Type: {type(sp)}"
-char.sp = 0  # reset to baseline
-
-print("\nChar info write tests complete!")
-print("----------------------------------")
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_ap_changes(char, before, delta, expected):
+	char.sp = before
+	assert char.sp == before, f"SP setting test failed! Expected: {before}; SP amount: {char.sp}; Type: {type(char.sp)}"
+	char.add_sp(delta)
+	assert char.sp == expected, f"SP adding test failed! Expected: {expected}; SP amount: {char.sp}; Type: {type(char.sp)}"
+	char.sp = 0  # reset to baseline
