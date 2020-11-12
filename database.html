@@ -56,6 +56,7 @@ Refer to the project wiki on GitHub for more in-depth examples.
 &#34;&#34;&#34;
 import mysql.connector as con
 from swordie_db.character import Character
+from swordie_db.user import User
 
 
 class SwordieDB:
@@ -148,12 +149,39 @@ class SwordieDB:
                 &#34;host&#34;: self.host,
                 &#34;user&#34;: self.user,
                 &#34;password&#34;: self.password,
-                &#34;schema&#34;: self.schema
+                &#34;schema&#34;: self.schema,
+                &#34;port&#34;: self.port
             }
             character = Character(character_stats, database_config)
             return character
         except Exception as e:
             print(&#34;[ERROR] Error trying to retrieve character from database.&#34;, e)
+            return None
+
+    def get_user_by_username(self, username):
+        &#34;&#34;&#34;
+        Given a username (NOT IGN), create a user object.
+        Useful for getting account information from accounts with no characters at all
+        :param username: string
+        :return: User
+        &#34;&#34;&#34;
+        try:
+            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
+            cursor = database.cursor(dictionary=True)
+            cursor.execute(f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;)
+            user_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
+            database_config = {
+                &#34;host&#34;: self.host,
+                &#34;user&#34;: self.user,
+                &#34;password&#34;: self.password,
+                &#34;schema&#34;: self.schema,
+                &#34;port&#34;: self.port
+            }
+            database.disconnect()
+            user = User(user_stats, database_config)
+            return user
+        except Exception as e:
+            print(&#34;[ERROR] Error trying to obtain a user object&#34;, e)
             return None
 
     def set_char_stat(self, name, column, value):
@@ -351,12 +379,39 @@ that has attributes identical to the character with IGN "name" in the connected 
                 &#34;host&#34;: self.host,
                 &#34;user&#34;: self.user,
                 &#34;password&#34;: self.password,
-                &#34;schema&#34;: self.schema
+                &#34;schema&#34;: self.schema,
+                &#34;port&#34;: self.port
             }
             character = Character(character_stats, database_config)
             return character
         except Exception as e:
             print(&#34;[ERROR] Error trying to retrieve character from database.&#34;, e)
+            return None
+
+    def get_user_by_username(self, username):
+        &#34;&#34;&#34;
+        Given a username (NOT IGN), create a user object.
+        Useful for getting account information from accounts with no characters at all
+        :param username: string
+        :return: User
+        &#34;&#34;&#34;
+        try:
+            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
+            cursor = database.cursor(dictionary=True)
+            cursor.execute(f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;)
+            user_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
+            database_config = {
+                &#34;host&#34;: self.host,
+                &#34;user&#34;: self.user,
+                &#34;password&#34;: self.password,
+                &#34;schema&#34;: self.schema,
+                &#34;port&#34;: self.port
+            }
+            database.disconnect()
+            user = User(user_stats, database_config)
+            return user
+        except Exception as e:
+            print(&#34;[ERROR] Error trying to obtain a user object&#34;, e)
             return None
 
     def set_char_stat(self, name, column, value):
@@ -548,12 +603,52 @@ Defaults to None if the operation fails.</p>
             &#34;host&#34;: self.host,
             &#34;user&#34;: self.user,
             &#34;password&#34;: self.password,
-            &#34;schema&#34;: self.schema
+            &#34;schema&#34;: self.schema,
+            &#34;port&#34;: self.port
         }
         character = Character(character_stats, database_config)
         return character
     except Exception as e:
         print(&#34;[ERROR] Error trying to retrieve character from database.&#34;, e)
+        return None</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.database.SwordieDB.get_user_by_username"><code class="name flex">
+<span>def <span class="ident">get_user_by_username</span></span>(<span>self, username)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a username (NOT IGN), create a user object.
+Useful for getting account information from accounts with no characters at all
+:param username: string
+:return: User</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_user_by_username(self, username):
+    &#34;&#34;&#34;
+    Given a username (NOT IGN), create a user object.
+    Useful for getting account information from accounts with no characters at all
+    :param username: string
+    :return: User
+    &#34;&#34;&#34;
+    try:
+        database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
+        cursor = database.cursor(dictionary=True)
+        cursor.execute(f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;)
+        user_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
+        database_config = {
+            &#34;host&#34;: self.host,
+            &#34;user&#34;: self.user,
+            &#34;password&#34;: self.password,
+            &#34;schema&#34;: self.schema,
+            &#34;port&#34;: self.port
+        }
+        database.disconnect()
+        user = User(user_stats, database_config)
+        return user
+    except Exception as e:
+        print(&#34;[ERROR] Error trying to obtain a user object&#34;, e)
         return None</code></pre>
 </details>
 </dd>
@@ -706,8 +801,9 @@ Defaults to None if the operation fails.</p>
 <ul>
 <li>
 <h4><code><a title="swordie_db.database.SwordieDB" href="#swordie_db.database.SwordieDB">SwordieDB</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="swordie_db.database.SwordieDB.get_char_by_name" href="#swordie_db.database.SwordieDB.get_char_by_name">get_char_by_name</a></code></li>
+<li><code><a title="swordie_db.database.SwordieDB.get_user_by_username" href="#swordie_db.database.SwordieDB.get_user_by_username">get_user_by_username</a></code></li>
 <li><code><a title="swordie_db.database.SwordieDB.get_user_id_by_name" href="#swordie_db.database.SwordieDB.get_user_id_by_name">get_user_id_by_name</a></code></li>
 <li><code><a title="swordie_db.database.SwordieDB.host" href="#swordie_db.database.SwordieDB.host">host</a></code></li>
 <li><code><a title="swordie_db.database.SwordieDB.password" href="#swordie_db.database.SwordieDB.password">password</a></code></li>
