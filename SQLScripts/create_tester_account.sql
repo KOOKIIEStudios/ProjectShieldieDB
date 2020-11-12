@@ -30,14 +30,14 @@ eventpoint, albaactivityid, albastarttime, albaduration, albaspecialreward, burn
 charactercard, accountlastlogout, lastlogout, gachexp, honorexp, nextavailablefametime)
 VALUES (900001, 900001, 900001, 1, 'tester', 0, 0, 23300, 36786, 
 0, 0, 0, 1, 0, 12, 5, 4, 4, 50, 50, 0, 0, 0, 0, '0', 0, 
-'0', 0, 900001, '100000000', 0, 0, 0, 0, 0, 
+'0', 0, 900001, '4000011', 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 
 900001, 0, 0, 0, 0, 0, 
 0, 0, '1601-01-01 11:13:45.000', 0, 0, 0, 
 900001, 900001, '1601-01-01 11:13:45.000', 0, 0, '1601-01-01 11:13:45.000')
 ON DUPLICATE KEY UPDATE characterid=900001, characteridforlog=900001, worldidforlog=1, `name`='tester', gender=0, skin=0, face=23300, hair=36786, 
 mixbasehaircolor=0, mixaddhaircolor=0, mixhairbaseprob=0, `level`=1, job=0, str=12, dex=5, inte=4, luk=4, hp=50, maxhp=50, mp=0, maxmp=0, ap=0, sp=0, `exp`='0', pop=0,
-money='0', wp=0, extendsp=0, posmap='100000000', portal=0, subjob=0, deffaceacc=0, fatigue=0, lastfatigueupdatetime=0, 
+money='0', wp=0, extendsp=0, posmap='4000011', portal=0, subjob=0, deffaceacc=0, fatigue=0, lastfatigueupdatetime=0, 
 charismaexp=0, insightexp=0, willexp=0, craftexp=0, senseexp=0, charmexp=0, 
 noncombatstatdaylimit=900001, pvpexp=0, pvpgrade=0, pvppoint=0, pvpmodelevel=0, pvpmodetype=0, 
 eventpoint=0, albaactivityid=0, albastarttime='1601-01-01 11:13:45.000', albaduration=0, albaspecialreward=0, burning=0, 
