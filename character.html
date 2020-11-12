@@ -39,6 +39,7 @@ Refer to database.py or the project wiki on GitHub for usage examples.
 import mysql.connector as con
 
 from swordie_db import JOBS
+from swordie_db.inventory import Inventory
 from swordie_db.user import User
 
 
@@ -128,8 +129,8 @@ class Character:
         self._etc_inv_id = 0
         self._install_inv_id = 0
         self._cash_inv_id = 0
+        self._inventory = None
         # Create Inventory object instance via class constructor, using details from Character object instance
-        # (Stipulated algorithm for unfinished sequence)
         self.init_inv_id()
 
         # Create User object instance via class constructor, using details from Character object instance
@@ -209,7 +210,7 @@ class Character:
         &#34;&#34;&#34;
         inventory_ids = self.get_db(
             self._database_config,
-            f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
+            f&#34;SELECT equippedinventory, equipinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
             f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
         )  # The row will always be 0 because there should be no characters with the same ID
 
@@ -219,6 +220,7 @@ class Character:
         self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
         self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
         self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+        self._inventory = Inventory(self.get_inventory_ids(), self.database_config)
 
     # Static method for fetching DB
     @staticmethod
@@ -490,6 +492,23 @@ class Character:
         }
         return primary_stats
 
+    def get_inventory_ids(self):
+        &#34;&#34;&#34;Returns equip_inv_id, equipped_inv_id, consume_inv_id, etc_inv_id, install_inv_id, cash_inv_id in a dict
+
+        Returns:
+            dictionary of all inventory ids from corresponding character
+        &#34;&#34;&#34;
+        inventory_ids = {
+            &#34;equip_inv_id&#34;: self.equip_inv_id,
+            &#34;equipped_inv_id&#34;: self.equipped_inv_id,
+            &#34;consume_inv_id&#34;: self.consume_inv_id,
+            &#34;etc_inv_id&#34;: self.etc_inv_id,
+            &#34;install_inv_id&#34;: self.install_inv_id,
+            &#34;cash_inv_id&#34;: self.cash_inv_id
+        }
+
+        return inventory_ids
+
     @property
     def max_hp(self):
         return self._max_hp
@@ -589,6 +608,10 @@ class Character:
     @property
     def equip_inv_id(self):
         return self._equip_inv_id
+
+    @property
+    def inventory(self):
+        return self._inventory
 
     def get_user_id(self):
         &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
@@ -857,8 +880,8 @@ This class contains the appropriate getter and setter methods for said attribute
         self._etc_inv_id = 0
         self._install_inv_id = 0
         self._cash_inv_id = 0
+        self._inventory = None
         # Create Inventory object instance via class constructor, using details from Character object instance
-        # (Stipulated algorithm for unfinished sequence)
         self.init_inv_id()
 
         # Create User object instance via class constructor, using details from Character object instance
@@ -938,7 +961,7 @@ This class contains the appropriate getter and setter methods for said attribute
         &#34;&#34;&#34;
         inventory_ids = self.get_db(
             self._database_config,
-            f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
+            f&#34;SELECT equippedinventory, equipinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
             f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
         )  # The row will always be 0 because there should be no characters with the same ID
 
@@ -948,6 +971,7 @@ This class contains the appropriate getter and setter methods for said attribute
         self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
         self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
         self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+        self._inventory = Inventory(self.get_inventory_ids(), self.database_config)
 
     # Static method for fetching DB
     @staticmethod
@@ -1219,6 +1243,23 @@ This class contains the appropriate getter and setter methods for said attribute
         }
         return primary_stats
 
+    def get_inventory_ids(self):
+        &#34;&#34;&#34;Returns equip_inv_id, equipped_inv_id, consume_inv_id, etc_inv_id, install_inv_id, cash_inv_id in a dict
+
+        Returns:
+            dictionary of all inventory ids from corresponding character
+        &#34;&#34;&#34;
+        inventory_ids = {
+            &#34;equip_inv_id&#34;: self.equip_inv_id,
+            &#34;equipped_inv_id&#34;: self.equipped_inv_id,
+            &#34;consume_inv_id&#34;: self.consume_inv_id,
+            &#34;etc_inv_id&#34;: self.etc_inv_id,
+            &#34;install_inv_id&#34;: self.install_inv_id,
+            &#34;cash_inv_id&#34;: self.cash_inv_id
+        }
+
+        return inventory_ids
+
     @property
     def max_hp(self):
         return self._max_hp
@@ -1318,6 +1359,10 @@ This class contains the appropriate getter and setter methods for said attribute
     @property
     def equip_inv_id(self):
         return self._equip_inv_id
+
+    @property
+    def inventory(self):
+        return self._inventory
 
     def get_user_id(self):
         &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
@@ -1647,6 +1692,18 @@ def install_inv_id(self):
 <pre><code class="python">@property
 def inte(self):
     return self._inte</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.inventory"><code class="name">var <span class="ident">inventory</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def inventory(self):
+    return self._inventory</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.job"><code class="name">var <span class="ident">job</span></code></dt>
@@ -2096,6 +2153,35 @@ def user(self):
     self.strength = new_str</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.character.Character.get_inventory_ids"><code class="name flex">
+<span>def <span class="ident">get_inventory_ids</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns equip_inv_id, equipped_inv_id, consume_inv_id, etc_inv_id, install_inv_id, cash_inv_id in a dict</p>
+<h2 id="returns">Returns</h2>
+<p>dictionary of all inventory ids from corresponding character</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_inventory_ids(self):
+    &#34;&#34;&#34;Returns equip_inv_id, equipped_inv_id, consume_inv_id, etc_inv_id, install_inv_id, cash_inv_id in a dict
+
+    Returns:
+        dictionary of all inventory ids from corresponding character
+    &#34;&#34;&#34;
+    inventory_ids = {
+        &#34;equip_inv_id&#34;: self.equip_inv_id,
+        &#34;equipped_inv_id&#34;: self.equipped_inv_id,
+        &#34;consume_inv_id&#34;: self.consume_inv_id,
+        &#34;etc_inv_id&#34;: self.etc_inv_id,
+        &#34;install_inv_id&#34;: self.install_inv_id,
+        &#34;cash_inv_id&#34;: self.cash_inv_id
+    }
+
+    return inventory_ids</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.character.Character.get_job_name"><code class="name flex">
 <span>def <span class="ident">get_job_name</span></span>(<span>self)</span>
 </code></dt>
@@ -2259,7 +2345,7 @@ a new Inventory object instance, with the relevant character attributes from the
     &#34;&#34;&#34;
     inventory_ids = self.get_db(
         self._database_config,
-        f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
+        f&#34;SELECT equippedinventory, equipinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
         f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
     )  # The row will always be 0 because there should be no characters with the same ID
 
@@ -2268,7 +2354,8 @@ a new Inventory object instance, with the relevant character attributes from the
     self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
     self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
     self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
-    self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]</code></pre>
+    self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+    self._inventory = Inventory(self.get_inventory_ids(), self.database_config)</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.init_stats"><code class="name flex">
@@ -2481,6 +2568,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.face" href="#swordie_db.character.Character.face">face</a></code></li>
 <li><code><a title="swordie_db.character.Character.fame" href="#swordie_db.character.Character.fame">fame</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_db" href="#swordie_db.character.Character.get_db">get_db</a></code></li>
+<li><code><a title="swordie_db.character.Character.get_inventory_ids" href="#swordie_db.character.Character.get_inventory_ids">get_inventory_ids</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_job_name" href="#swordie_db.character.Character.get_job_name">get_job_name</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_primary_stats" href="#swordie_db.character.Character.get_primary_stats">get_primary_stats</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_stat_by_column" href="#swordie_db.character.Character.get_stat_by_column">get_stat_by_column</a></code></li>
@@ -2491,6 +2579,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.init_user" href="#swordie_db.character.Character.init_user">init_user</a></code></li>
 <li><code><a title="swordie_db.character.Character.install_inv_id" href="#swordie_db.character.Character.install_inv_id">install_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.inte" href="#swordie_db.character.Character.inte">inte</a></code></li>
+<li><code><a title="swordie_db.character.Character.inventory" href="#swordie_db.character.Character.inventory">inventory</a></code></li>
 <li><code><a title="swordie_db.character.Character.job" href="#swordie_db.character.Character.job">job</a></code></li>
 <li><code><a title="swordie_db.character.Character.level" href="#swordie_db.character.Character.level">level</a></code></li>
 <li><code><a title="swordie_db.character.Character.luk" href="#swordie_db.character.Character.luk">luk</a></code></li>

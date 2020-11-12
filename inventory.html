@@ -26,37 +26,119 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Inventory:
+<pre><code class="python">import mysql.connector as con
 
-    def __init__(self):
+
+class Inventory:
+
+    def __init__(self, inv_ids, db_config):
         &#34;&#34;&#34;
 
-        Possible solution 1:
-            All &#34;inv&#34; attributes will be dictionaries
-            Key: bag index
-            Value: a dictionary with item_info
+        :param inv_ids: dictionary
+        :param db_config: dictionary
 
-        Possible Solution 2:
-            Make an Item Class that stores all of that info and store these Item objects into the dictionary
-
-        EX:
-        equip_inv = {
-            # Bag index 1
-            &#34;1&#34; :{
-                    &#34;itemid&#34;: 2000005
-                    &#34;invtype&#34;: 1 # It&#39;s &#34;1&#34; in this case because Equip inventory ID is 1
-                    &#34;quantity&#34;: 300
-                    &#34;iscash&#34;: False
-                 }
-        }
+        Every inventory attribute is a dictionary where the key is the bag index of the item
+        The Value is a dictionary pertaining attributes from items table in Swordie DB
         &#34;&#34;&#34;
-        self._inventory_id = 0
-        self._equip_inv = {}
-        self._use_inv = {}
-        self._etc_inv = {}
-        self._cash_inc = {}
+        self._inventory_ids = inv_ids
+        self._database_config = db_config
 
-        self._equipped_inv = {}</code></pre>
+        self._equip_inv = self.init_equip_items()
+        self._use_inv = self.init_use_inv()
+        self._etc_inv = self.init_etc_inv()
+        self._cash_inv = self.init_cash_inv()
+        self._install_inv = self.init_install_inv()
+
+        self._equipped_inv = self.init_equipped_inv()
+
+    @property
+    def database_config(self):
+        return self._database_config
+
+    @property
+    def inventory_ids(self):
+        return self._inventory_ids
+
+    @property
+    def equip_inv(self):
+        return self._equip_inv
+
+    @property
+    def consume_inv(self):
+        return self._use_inv
+
+    @property
+    def etc_inv(self):
+        return self._etc_inv
+
+    @property
+    def cash_inv(self):
+        return self._cash_inv
+
+    @property
+    def install_inv(self):
+        return self._install_inv
+
+    @property
+    def equipped_inv(self):
+        return self._equipped_inv
+
+    def init_equip_items(self):
+        return self.load_inv(&#34;equip_inv_id&#34;)
+
+    def init_use_inv(self):
+        return self.load_inv(&#34;consume_inv_id&#34;)
+
+    def init_etc_inv(self):
+        return self.load_inv(&#34;etc_inv_id&#34;)
+
+    def init_cash_inv(self):
+        return self.load_inv(&#34;cash_inv_id&#34;)
+
+    def init_equipped_inv(self):
+        return self.load_inv(&#34;equipped_inv_id&#34;)
+
+    def init_install_inv(self):
+        return self.load_inv(&#34;install_inv_id&#34;)
+
+    def load_inv(self, inventory_type):
+        &#34;&#34;&#34;
+        Given an inventory_type, load every item in it.
+        Refer to Character::init_inventory_ids() for a list of inventory_types.
+        :param inventory_type: string
+        :return: dictionary
+        &#34;&#34;&#34;
+        try:
+            database = con.connect(
+                host=self.database_config[&#34;host&#34;],
+                user=self.database_config[&#34;user&#34;],
+                password=self.database_config[&#34;password&#34;],
+                database=self.database_config[&#34;schema&#34;],
+                port=self.database_config[&#34;port&#34;]
+            )
+            cursor = database.cursor(dictionary=True)
+
+            cursor.execute(f&#34;SELECT * FROM items WHERE inventoryid = &#39;{self.inventory_ids[str(inventory_type)]}&#39;&#34;)
+            rows = cursor.fetchall()
+
+            inv = {}
+
+            for items in rows:
+                bag_index = items[&#34;bagindex&#34;]
+                item_id = items[&#34;itemid&#34;]
+                quantity = items[&#34;quantity&#34;]
+                inv_type = items[&#34;invtype&#34;]
+                is_cash = items[&#34;iscash&#34;]
+                item_stats = {
+                    &#34;itemid&#34;: item_id,
+                    &#34;quantity&#34;: quantity,
+                    &#34;invtype&#34;: inv_type,
+                    &#34;iscash&#34;: is_cash
+                }
+                inv[bag_index] = item_stats
+            return inv
+        except Exception as e:
+            print(&#34;Critical: Error occured when initializing equip items&#34;, e)</code></pre>
 </details>
 </section>
 <section>
@@ -70,60 +152,360 @@
 <dl>
 <dt id="swordie_db.inventory.Inventory"><code class="flex name class">
 <span>class <span class="ident">Inventory</span></span>
+<span>(</span><span>inv_ids, db_config)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Possible solution 1:
-All "inv" attributes will be dictionaries
-Key: bag index
-Value: a dictionary with item_info</p>
-<p>Possible Solution 2:
-Make an Item Class that stores all of that info and store these Item objects into the dictionary</p>
-<p>EX:
-equip_inv = {
-# Bag index 1
-"1" :{
-"itemid": 2000005
-"invtype": 1 # It's "1" in this case because Equip inventory ID is 1
-"quantity": 300
-"iscash": False
-}
-}</p></div>
+<div class="desc"><p>:param inv_ids: dictionary
+:param db_config: dictionary</p>
+<p>Every inventory attribute is a dictionary where the key is the bag index of the item
+The Value is a dictionary pertaining attributes from items table in Swordie DB</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Inventory:
 
-    def __init__(self):
+    def __init__(self, inv_ids, db_config):
         &#34;&#34;&#34;
 
-        Possible solution 1:
-            All &#34;inv&#34; attributes will be dictionaries
-            Key: bag index
-            Value: a dictionary with item_info
+        :param inv_ids: dictionary
+        :param db_config: dictionary
 
-        Possible Solution 2:
-            Make an Item Class that stores all of that info and store these Item objects into the dictionary
-
-        EX:
-        equip_inv = {
-            # Bag index 1
-            &#34;1&#34; :{
-                    &#34;itemid&#34;: 2000005
-                    &#34;invtype&#34;: 1 # It&#39;s &#34;1&#34; in this case because Equip inventory ID is 1
-                    &#34;quantity&#34;: 300
-                    &#34;iscash&#34;: False
-                 }
-        }
+        Every inventory attribute is a dictionary where the key is the bag index of the item
+        The Value is a dictionary pertaining attributes from items table in Swordie DB
         &#34;&#34;&#34;
-        self._inventory_id = 0
-        self._equip_inv = {}
-        self._use_inv = {}
-        self._etc_inv = {}
-        self._cash_inc = {}
+        self._inventory_ids = inv_ids
+        self._database_config = db_config
 
-        self._equipped_inv = {}</code></pre>
+        self._equip_inv = self.init_equip_items()
+        self._use_inv = self.init_use_inv()
+        self._etc_inv = self.init_etc_inv()
+        self._cash_inv = self.init_cash_inv()
+        self._install_inv = self.init_install_inv()
+
+        self._equipped_inv = self.init_equipped_inv()
+
+    @property
+    def database_config(self):
+        return self._database_config
+
+    @property
+    def inventory_ids(self):
+        return self._inventory_ids
+
+    @property
+    def equip_inv(self):
+        return self._equip_inv
+
+    @property
+    def consume_inv(self):
+        return self._use_inv
+
+    @property
+    def etc_inv(self):
+        return self._etc_inv
+
+    @property
+    def cash_inv(self):
+        return self._cash_inv
+
+    @property
+    def install_inv(self):
+        return self._install_inv
+
+    @property
+    def equipped_inv(self):
+        return self._equipped_inv
+
+    def init_equip_items(self):
+        return self.load_inv(&#34;equip_inv_id&#34;)
+
+    def init_use_inv(self):
+        return self.load_inv(&#34;consume_inv_id&#34;)
+
+    def init_etc_inv(self):
+        return self.load_inv(&#34;etc_inv_id&#34;)
+
+    def init_cash_inv(self):
+        return self.load_inv(&#34;cash_inv_id&#34;)
+
+    def init_equipped_inv(self):
+        return self.load_inv(&#34;equipped_inv_id&#34;)
+
+    def init_install_inv(self):
+        return self.load_inv(&#34;install_inv_id&#34;)
+
+    def load_inv(self, inventory_type):
+        &#34;&#34;&#34;
+        Given an inventory_type, load every item in it.
+        Refer to Character::init_inventory_ids() for a list of inventory_types.
+        :param inventory_type: string
+        :return: dictionary
+        &#34;&#34;&#34;
+        try:
+            database = con.connect(
+                host=self.database_config[&#34;host&#34;],
+                user=self.database_config[&#34;user&#34;],
+                password=self.database_config[&#34;password&#34;],
+                database=self.database_config[&#34;schema&#34;],
+                port=self.database_config[&#34;port&#34;]
+            )
+            cursor = database.cursor(dictionary=True)
+
+            cursor.execute(f&#34;SELECT * FROM items WHERE inventoryid = &#39;{self.inventory_ids[str(inventory_type)]}&#39;&#34;)
+            rows = cursor.fetchall()
+
+            inv = {}
+
+            for items in rows:
+                bag_index = items[&#34;bagindex&#34;]
+                item_id = items[&#34;itemid&#34;]
+                quantity = items[&#34;quantity&#34;]
+                inv_type = items[&#34;invtype&#34;]
+                is_cash = items[&#34;iscash&#34;]
+                item_stats = {
+                    &#34;itemid&#34;: item_id,
+                    &#34;quantity&#34;: quantity,
+                    &#34;invtype&#34;: inv_type,
+                    &#34;iscash&#34;: is_cash
+                }
+                inv[bag_index] = item_stats
+            return inv
+        except Exception as e:
+            print(&#34;Critical: Error occured when initializing equip items&#34;, e)</code></pre>
 </details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="swordie_db.inventory.Inventory.cash_inv"><code class="name">var <span class="ident">cash_inv</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def cash_inv(self):
+    return self._cash_inv</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.consume_inv"><code class="name">var <span class="ident">consume_inv</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def consume_inv(self):
+    return self._use_inv</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.database_config"><code class="name">var <span class="ident">database_config</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def database_config(self):
+    return self._database_config</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.equip_inv"><code class="name">var <span class="ident">equip_inv</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def equip_inv(self):
+    return self._equip_inv</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.equipped_inv"><code class="name">var <span class="ident">equipped_inv</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def equipped_inv(self):
+    return self._equipped_inv</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.etc_inv"><code class="name">var <span class="ident">etc_inv</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def etc_inv(self):
+    return self._etc_inv</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.install_inv"><code class="name">var <span class="ident">install_inv</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def install_inv(self):
+    return self._install_inv</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.inventory_ids"><code class="name">var <span class="ident">inventory_ids</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def inventory_ids(self):
+    return self._inventory_ids</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="swordie_db.inventory.Inventory.init_cash_inv"><code class="name flex">
+<span>def <span class="ident">init_cash_inv</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_cash_inv(self):
+    return self.load_inv(&#34;cash_inv_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.init_equip_items"><code class="name flex">
+<span>def <span class="ident">init_equip_items</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_equip_items(self):
+    return self.load_inv(&#34;equip_inv_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.init_equipped_inv"><code class="name flex">
+<span>def <span class="ident">init_equipped_inv</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_equipped_inv(self):
+    return self.load_inv(&#34;equipped_inv_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.init_etc_inv"><code class="name flex">
+<span>def <span class="ident">init_etc_inv</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_etc_inv(self):
+    return self.load_inv(&#34;etc_inv_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.init_install_inv"><code class="name flex">
+<span>def <span class="ident">init_install_inv</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_install_inv(self):
+    return self.load_inv(&#34;install_inv_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.init_use_inv"><code class="name flex">
+<span>def <span class="ident">init_use_inv</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def init_use_inv(self):
+    return self.load_inv(&#34;consume_inv_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.load_inv"><code class="name flex">
+<span>def <span class="ident">load_inv</span></span>(<span>self, inventory_type)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given an inventory_type, load every item in it.
+Refer to Character::init_inventory_ids() for a list of inventory_types.
+:param inventory_type: string
+:return: dictionary</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_inv(self, inventory_type):
+    &#34;&#34;&#34;
+    Given an inventory_type, load every item in it.
+    Refer to Character::init_inventory_ids() for a list of inventory_types.
+    :param inventory_type: string
+    :return: dictionary
+    &#34;&#34;&#34;
+    try:
+        database = con.connect(
+            host=self.database_config[&#34;host&#34;],
+            user=self.database_config[&#34;user&#34;],
+            password=self.database_config[&#34;password&#34;],
+            database=self.database_config[&#34;schema&#34;],
+            port=self.database_config[&#34;port&#34;]
+        )
+        cursor = database.cursor(dictionary=True)
+
+        cursor.execute(f&#34;SELECT * FROM items WHERE inventoryid = &#39;{self.inventory_ids[str(inventory_type)]}&#39;&#34;)
+        rows = cursor.fetchall()
+
+        inv = {}
+
+        for items in rows:
+            bag_index = items[&#34;bagindex&#34;]
+            item_id = items[&#34;itemid&#34;]
+            quantity = items[&#34;quantity&#34;]
+            inv_type = items[&#34;invtype&#34;]
+            is_cash = items[&#34;iscash&#34;]
+            item_stats = {
+                &#34;itemid&#34;: item_id,
+                &#34;quantity&#34;: quantity,
+                &#34;invtype&#34;: inv_type,
+                &#34;iscash&#34;: is_cash
+            }
+            inv[bag_index] = item_stats
+        return inv
+    except Exception as e:
+        print(&#34;Critical: Error occured when initializing equip items&#34;, e)</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -143,6 +525,23 @@ equip_inv = {
 <ul>
 <li>
 <h4><code><a title="swordie_db.inventory.Inventory" href="#swordie_db.inventory.Inventory">Inventory</a></code></h4>
+<ul class="two-column">
+<li><code><a title="swordie_db.inventory.Inventory.cash_inv" href="#swordie_db.inventory.Inventory.cash_inv">cash_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.consume_inv" href="#swordie_db.inventory.Inventory.consume_inv">consume_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.database_config" href="#swordie_db.inventory.Inventory.database_config">database_config</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.equip_inv" href="#swordie_db.inventory.Inventory.equip_inv">equip_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.equipped_inv" href="#swordie_db.inventory.Inventory.equipped_inv">equipped_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.etc_inv" href="#swordie_db.inventory.Inventory.etc_inv">etc_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.init_cash_inv" href="#swordie_db.inventory.Inventory.init_cash_inv">init_cash_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.init_equip_items" href="#swordie_db.inventory.Inventory.init_equip_items">init_equip_items</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.init_equipped_inv" href="#swordie_db.inventory.Inventory.init_equipped_inv">init_equipped_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.init_etc_inv" href="#swordie_db.inventory.Inventory.init_etc_inv">init_etc_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.init_install_inv" href="#swordie_db.inventory.Inventory.init_install_inv">init_install_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.init_use_inv" href="#swordie_db.inventory.Inventory.init_use_inv">init_use_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.install_inv" href="#swordie_db.inventory.Inventory.install_inv">install_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.inventory_ids" href="#swordie_db.inventory.Inventory.inventory_ids">inventory_ids</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.load_inv" href="#swordie_db.inventory.Inventory.load_inv">load_inv</a></code></li>
+</ul>
 </li>
 </ul>
 </li>
