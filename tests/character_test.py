@@ -111,7 +111,7 @@ def test_level_changes(char, before, delta, expected):
 @pytest.mark.parametrize("before, expected",[
 	(0, 100),
 ])
-def test_level_changes(char, before, expected):
+def test_job_changes(char, before, expected):
 	char.job = expected  # set job ID to warrior
 	assert char.job == expected, f"Job ID setting test failed! Expected: {expected}; Job ID: {char.job}; Type: {type(char.job)}"
 	char.job = before  # reset job ID to beginner
@@ -143,7 +143,7 @@ def test_face_changes(char, before, expected):
 @pytest.mark.parametrize("before, expected",[
 	(36786, 30027),
 ])
-def test_face_changes(char, before, expected):
+def test_hair_changes(char, before, expected):
 	char.hair = expected
 	assert hair == expected, f"Hair ID setting test failed! Expected: {expected}; Hair ID: {char.hair}; Type: {type(char.hair)}"
 	char.hair = before  # reset to baseline
@@ -159,7 +159,7 @@ def test_skin_changes(char, before, expected):
 @pytest.mark.parametrize("before, delta, expected",[
 	("314159", 2827433, "3141592"),
 ])
-def test_level_changes(char, before, delta, expected):
+def test_exp_changes(char, before, delta, expected):
 	char.exp = before
 	assert exp == before, f"EXP test setting failed! Expected: {before}; EXP amount: {char.exp}; Type: {type(char.exp)}"
 	char.add_exp(delta)
@@ -175,29 +175,32 @@ char.dex = 31
 char.inte = 31
 char.luk = 31
 
-strength = char.strength  # re-fetch data
-assert strength == 31, f"STR setting test failed! Expected: {expected}; STR amount: {strength}; Type: {type(strength)}"
-char.add_str(1)
-strength = char.strength  # re-fetch data
-assert strength == 32, f"STR adding test failed! Expected: {expected}; STR amount: {strength}; Type: {type(strength)}"
-char.strength = 12  # reset to baseline
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_strength_changes(char, before, delta, expected):
+	char.strength = before
+	assert char.strength == before, f"STR setting test failed! Expected: {before}; STR amount: {char.strength}; Type: {type(char.strength)}"
+	char.add_str(delta)
+	assert char.strength == expected, f"STR adding test failed! Expected: {expected}; STR amount: {char.strength}; Type: {type(char.strength)}"
+	char.strength = 12  # reset to baseline
 
 dex = char.dex  # re-fetch data
-assert dex == 31, f"DEX setting test failed! Expected: {expected}; DEX amount: {dex}; Type: {type(dex)}"
+assert dex == 31, f"DEX setting test failed! Expected: {before}; DEX amount: {dex}; Type: {type(dex)}"
 char.add_dex(1)
 dex = char.dex  # re-fetch data
 assert dex == 32, f"DEX adding test failed! Expected: {expected}; DEX amount: {dex}; Type: {type(dex)}"
 char.dex = 5  # reset to baseline
 
 inte = char.inte  # re-fetch data
-assert inte == 31, f"INT setting test failed! Expected: {expected}; INT amount: {inte}; Type: {type(inte)}"
+assert inte == 31, f"INT setting test failed! Expected: {before}; INT amount: {inte}; Type: {type(inte)}"
 char.add_inte(1)
 inte = char.inte  # re-fetch data
 assert inte == 32, f"INT adding test failed! Expected: {expected}; INT amount: {inte}; Type: {type(inte)}"
 char.inte = 4  # reset to baseline
 
 luk = char.luk  # re-fetch data
-assert luk == 31, f"LUK setting test failed! Expected: {expected}; LUK amount: {luk}; Type: {type(luk)}"
+assert luk == 31, f"LUK setting test failed! Expected: {before}; LUK amount: {luk}; Type: {type(luk)}"
 char.add_luk(1)
 luk = char.luk  # re-fetch data
 assert luk == 32, f"LUK adding test failed! Expected: {expected}; LUK amount: {luk}; Type: {type(luk)}"
@@ -213,28 +216,28 @@ char.ap = 31
 char.sp = 31
 
 hp = char.max_hp  # re-fetch data
-assert hp == 31, f"HP setting test failed! Expected: {expected}; HP amount: {hp}; Type: {type(hp)}"
+assert hp == 31, f"HP setting test failed! Expected: {before}; HP amount: {hp}; Type: {type(hp)}"
 char.add_max_hp(1)
 hp = char.max_hp  # re-fetch data
 assert hp == 32, f"HP adding test failed! Expected: {expected}; HP amount: {hp}; Type: {type(hp)}"
 char.max_hp = 50  # reset to baseline
 
 mp = char.max_mp  # re-fetch data
-assert mp == 31, f"MP setting test failed! Expected: {expected}; MP amount: {mp}; Type: {type(mp)}"
+assert mp == 31, f"MP setting test failed! Expected: {before}; MP amount: {mp}; Type: {type(mp)}"
 char.add_max_mp(1)
 mp = char.max_mp  # re-fetch data
 assert mp == 32, f"MP adding test failed! Expected: {expected}; MP amount: {mp}; Type: {type(mp)}"
 char.max_mp = 0  # reset to baseline
 
 ap = char.ap  # re-fetch data
-assert ap == 31, f"AP setting test failed! Expected: {expected}; AP amount: {ap}; Type: {type(ap)}"
+assert ap == 31, f"AP setting test failed! Expected: {before}; AP amount: {ap}; Type: {type(ap)}"
 char.add_ap(1)
 ap = char.ap  # re-fetch data
 assert ap == 32, f"AP adding test failed! Expected: {expected}; AP amount: {ap}; Type: {type(ap)}"
 char.ap = 0  # reset to baseline
 
 sp = char.sp  # re-fetch data
-assert sp == 31, f"SP setting test failed! Expected: {expected}; SP amount: {sp}; Type: {type(sp)}"
+assert sp == 31, f"SP setting test failed! Expected: {before}; SP amount: {sp}; Type: {type(sp)}"
 char.add_sp(1)
 sp = char.sp  # re-fetch data
 assert sp == 32, f"SP adding test failed! Expected: {expected}; SP amount: {sp}; Type: {type(sp)}"
