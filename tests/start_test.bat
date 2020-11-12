@@ -5,3 +5,4 @@ call venv\scripts\activate.bat
 echo "Attempting to test the capabilities of SowrdieDB..."
 py.test
 echo "Test concluded."
+pause
