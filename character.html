@@ -70,11 +70,11 @@ class Character:
         max_mp: Integer, representing character Max MP stat pool
         ap: Integer, representing character free Ability Points (AP) pool
         sp: Integer, representing character free SP points pool
-        equipped_inv_id: Integer, representing the equipped inventory id
-        consume_inv_id: Integer, representing &#34;consume&#34; aka Use inventory id
-        etc_inv_id: Integer, representing etc inventory id
-        install_inv_id: Integer, representing install/setup inventory id
-        cash_inv_id: Integer, representing cash/nx inventory id
+        equipped_inv_id: Integer, representing the &#34;equipped&#34; (i.e. Hotkey &#34;E&#34; in-game) inventory id
+        consume_inv_id: Integer, representing &#34;consume&#34; (aka USE) inventory id
+        etc_inv_id: Integer, representing &#34;etc&#34; (aka ETC) inventory id
+        install_inv_id: Integer, representing &#34;install&#34; (aka SETUP) inventory id
+        cash_inv_id: Integer, representing &#34;cash&#34; (aka CASH) inventory id
     &#34;&#34;&#34;
 
     def __init__(self, char_stats, database_config):
@@ -126,8 +126,11 @@ class Character:
         self._etc_inv_id = 0
         self._install_inv_id = 0
         self._cash_inv_id = 0
+        # Create Inventory object instance via class constructor, using details from Character object instance
+        # (Stipulated algorithm for unfinished sequence)
         self.init_inv_id()
 
+        # Create User object instance via class constructor, using details from Character object instance
         self._user = self.init_user()
 
     def init_stats(self):
@@ -179,55 +182,73 @@ class Character:
         Returns:
             User
         Raises:
-            Generic error on failure
+            Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
-
         user_id = self.get_user_id()
+        
+        user_stats = self.get_db(
+            self._database_config,
+            f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;
+        )  # The row will always be 0 because there should be no characters with the same name
 
-        try:
-            host = self._database_config[&#34;host&#34;]
-            user = self._database_config[&#34;user&#34;]
-            password = self._database_config[&#34;password&#34;]
-            schema = self._database_config[&#34;schema&#34;]
-            port = self._database_config[&#34;port&#34;]
-
-            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
-
-            cursor = database.cursor(dictionary=True)
-
-            cursor.execute(f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;)
-
-            user_stats = cursor.fetchall()[0]
-            database.disconnect()
-            # The row will always be 0 because there should be no characters with the same name
-            user = User(user_stats, self.database_config)
-            return user
-
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to retrieve User Data.&#34;, e)
+        user = User(user_stats, self.database_config)
+        return user
 
     def init_inv_id(self):
-        try:
-            host = self._database_config[&#34;host&#34;]
-            user = self._database_config[&#34;user&#34;]
-            password = self._database_config[&#34;password&#34;]
-            schema = self._database_config[&#34;schema&#34;]
-            port = self._database_config[&#34;port&#34;]
+        &#34;&#34;&#34;Fetch a dictionary of user attributes from Swordie&#39;s DB and use it to instantiate a new (custom) Inventory object
 
-            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+        (Stipulated algorithm for unfinished sequence)
+        Runs near the end of Character::__init__(char_stats, database_config).
+        Uses the Character ID associated with the character instance, and the Inventory class constructor to create
+        a new Inventory object instance, with the relevant character attributes from the database.
+
+        Raises:
+            Generic error on failure - handled by the Character::get_db() method
+        &#34;&#34;&#34;
+        inventory_ids = self.get_db(
+            self._database_config,
+            f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
+            f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
+        )  # The row will always be 0 because there should be no characters with the same ID
+        
+        self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
+        self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
+        self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
+        self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
+        self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+
+    # Static method for fetching DB
+    @staticmethod
+    def get_db(config, query):
+        &#34;&#34;&#34;Generic static method for fetching data from DB using the provided DB config and query
+        
+        This method assumes that only one character is found - it always defaults to the first result.
+        An effort has been made to convert this to a decorator so that it may also be applied to
+        Character::set_stat_by_column() &amp; Character::get_user_id(), which ultimately ended in failure.
+        
+        Args:
+            config, dictionary, representing database config attributes
+            query, String, representing SQL query
+        Returns:
+            String representing the result of the provided SQL query, using the provided DB connection attributes
+        &#34;&#34;&#34;
+        try:
+            database = con.connect(
+                host=config[&#34;host&#34;], 
+                user=config[&#34;user&#34;], 
+                password=config[&#34;password&#34;], 
+                database=config[&#34;schema&#34;], 
+                port=config[&#34;port&#34;]
+            )
             cursor = database.cursor(dictionary=True)
-            cursor.execute(f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;)
-            inventory_ids = cursor.fetchall()[0]
+            cursor.execute(query)
+            data = cursor.fetchall()[0]
             database.disconnect()
 
-            self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
-            self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
-            self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
-            self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
-            self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
-
+            return data
+            
         except Exception as e:
-            print(&#34;[ERROR] Error trying to obtain assign inventory ids.&#34;, e)
+            print(&#34;CRITICAL: Error encountered whilst attempting to connect to the database! \n&#34;, e)
 
     @property
     def database_config(self):
@@ -719,15 +740,15 @@ This class contains the appropriate getter and setter methods for said attribute
 <dt><strong><code>sp</code></strong></dt>
 <dd>Integer, representing character free SP points pool</dd>
 <dt><strong><code>equipped_inv_id</code></strong></dt>
-<dd>Integer, representing the equipped inventory id</dd>
+<dd>Integer, representing the "equipped" (i.e. Hotkey "E" in-game) inventory id</dd>
 <dt><strong><code>consume_inv_id</code></strong></dt>
-<dd>Integer, representing "consume" aka Use inventory id</dd>
+<dd>Integer, representing "consume" (aka USE) inventory id</dd>
 <dt><strong><code>etc_inv_id</code></strong></dt>
-<dd>Integer, representing etc inventory id</dd>
+<dd>Integer, representing "etc" (aka ETC) inventory id</dd>
 <dt><strong><code>install_inv_id</code></strong></dt>
-<dd>Integer, representing install/setup inventory id</dd>
+<dd>Integer, representing "install" (aka SETUP) inventory id</dd>
 <dt><strong><code>cash_inv_id</code></strong></dt>
-<dd>Integer, representing cash/nx inventory id</dd>
+<dd>Integer, representing "cash" (aka CASH) inventory id</dd>
 </dl>
 <p>Emulates how character object is handled server-sided</p>
 <h2 id="args">Args</h2>
@@ -769,11 +790,11 @@ This class contains the appropriate getter and setter methods for said attribute
         max_mp: Integer, representing character Max MP stat pool
         ap: Integer, representing character free Ability Points (AP) pool
         sp: Integer, representing character free SP points pool
-        equipped_inv_id: Integer, representing the equipped inventory id
-        consume_inv_id: Integer, representing &#34;consume&#34; aka Use inventory id
-        etc_inv_id: Integer, representing etc inventory id
-        install_inv_id: Integer, representing install/setup inventory id
-        cash_inv_id: Integer, representing cash/nx inventory id
+        equipped_inv_id: Integer, representing the &#34;equipped&#34; (i.e. Hotkey &#34;E&#34; in-game) inventory id
+        consume_inv_id: Integer, representing &#34;consume&#34; (aka USE) inventory id
+        etc_inv_id: Integer, representing &#34;etc&#34; (aka ETC) inventory id
+        install_inv_id: Integer, representing &#34;install&#34; (aka SETUP) inventory id
+        cash_inv_id: Integer, representing &#34;cash&#34; (aka CASH) inventory id
     &#34;&#34;&#34;
 
     def __init__(self, char_stats, database_config):
@@ -825,8 +846,11 @@ This class contains the appropriate getter and setter methods for said attribute
         self._etc_inv_id = 0
         self._install_inv_id = 0
         self._cash_inv_id = 0
+        # Create Inventory object instance via class constructor, using details from Character object instance
+        # (Stipulated algorithm for unfinished sequence)
         self.init_inv_id()
 
+        # Create User object instance via class constructor, using details from Character object instance
         self._user = self.init_user()
 
     def init_stats(self):
@@ -878,55 +902,73 @@ This class contains the appropriate getter and setter methods for said attribute
         Returns:
             User
         Raises:
-            Generic error on failure
+            Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
-
         user_id = self.get_user_id()
+        
+        user_stats = self.get_db(
+            self._database_config,
+            f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;
+        )  # The row will always be 0 because there should be no characters with the same name
 
-        try:
-            host = self._database_config[&#34;host&#34;]
-            user = self._database_config[&#34;user&#34;]
-            password = self._database_config[&#34;password&#34;]
-            schema = self._database_config[&#34;schema&#34;]
-            port = self._database_config[&#34;port&#34;]
-
-            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
-
-            cursor = database.cursor(dictionary=True)
-
-            cursor.execute(f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;)
-
-            user_stats = cursor.fetchall()[0]
-            database.disconnect()
-            # The row will always be 0 because there should be no characters with the same name
-            user = User(user_stats, self.database_config)
-            return user
-
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to retrieve User Data.&#34;, e)
+        user = User(user_stats, self.database_config)
+        return user
 
     def init_inv_id(self):
-        try:
-            host = self._database_config[&#34;host&#34;]
-            user = self._database_config[&#34;user&#34;]
-            password = self._database_config[&#34;password&#34;]
-            schema = self._database_config[&#34;schema&#34;]
-            port = self._database_config[&#34;port&#34;]
+        &#34;&#34;&#34;Fetch a dictionary of user attributes from Swordie&#39;s DB and use it to instantiate a new (custom) Inventory object
 
-            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+        (Stipulated algorithm for unfinished sequence)
+        Runs near the end of Character::__init__(char_stats, database_config).
+        Uses the Character ID associated with the character instance, and the Inventory class constructor to create
+        a new Inventory object instance, with the relevant character attributes from the database.
+
+        Raises:
+            Generic error on failure - handled by the Character::get_db() method
+        &#34;&#34;&#34;
+        inventory_ids = self.get_db(
+            self._database_config,
+            f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
+            f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
+        )  # The row will always be 0 because there should be no characters with the same ID
+        
+        self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
+        self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
+        self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
+        self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
+        self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
+
+    # Static method for fetching DB
+    @staticmethod
+    def get_db(config, query):
+        &#34;&#34;&#34;Generic static method for fetching data from DB using the provided DB config and query
+        
+        This method assumes that only one character is found - it always defaults to the first result.
+        An effort has been made to convert this to a decorator so that it may also be applied to
+        Character::set_stat_by_column() &amp; Character::get_user_id(), which ultimately ended in failure.
+        
+        Args:
+            config, dictionary, representing database config attributes
+            query, String, representing SQL query
+        Returns:
+            String representing the result of the provided SQL query, using the provided DB connection attributes
+        &#34;&#34;&#34;
+        try:
+            database = con.connect(
+                host=config[&#34;host&#34;], 
+                user=config[&#34;user&#34;], 
+                password=config[&#34;password&#34;], 
+                database=config[&#34;schema&#34;], 
+                port=config[&#34;port&#34;]
+            )
             cursor = database.cursor(dictionary=True)
-            cursor.execute(f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;)
-            inventory_ids = cursor.fetchall()[0]
+            cursor.execute(query)
+            data = cursor.fetchall()[0]
             database.disconnect()
 
-            self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
-            self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
-            self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
-            self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
-            self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
-
+            return data
+            
         except Exception as e:
-            print(&#34;[ERROR] Error trying to obtain assign inventory ids.&#34;, e)
+            print(&#34;CRITICAL: Error encountered whilst attempting to connect to the database! \n&#34;, e)
 
     @property
     def database_config(self):
@@ -1356,6 +1398,59 @@ This class contains the appropriate getter and setter methods for said attribute
             print(&#34;[ERROR] Error trying to get stats from given column.&#34;, e)
             return False</code></pre>
 </details>
+<h3>Static methods</h3>
+<dl>
+<dt id="swordie_db.character.Character.get_db"><code class="name flex">
+<span>def <span class="ident">get_db</span></span>(<span>config, query)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generic static method for fetching data from DB using the provided DB config and query</p>
+<p>This method assumes that only one character is found - it always defaults to the first result.
+An effort has been made to convert this to a decorator so that it may also be applied to
+Character::set_stat_by_column() &amp; Character::get_user_id(), which ultimately ended in failure.</p>
+<h2 id="args">Args</h2>
+<p>config, dictionary, representing database config attributes
+query, String, representing SQL query</p>
+<h2 id="returns">Returns</h2>
+<p>String representing the result of the provided SQL query, using the provided DB connection attributes</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def get_db(config, query):
+    &#34;&#34;&#34;Generic static method for fetching data from DB using the provided DB config and query
+    
+    This method assumes that only one character is found - it always defaults to the first result.
+    An effort has been made to convert this to a decorator so that it may also be applied to
+    Character::set_stat_by_column() &amp; Character::get_user_id(), which ultimately ended in failure.
+    
+    Args:
+        config, dictionary, representing database config attributes
+        query, String, representing SQL query
+    Returns:
+        String representing the result of the provided SQL query, using the provided DB connection attributes
+    &#34;&#34;&#34;
+    try:
+        database = con.connect(
+            host=config[&#34;host&#34;], 
+            user=config[&#34;user&#34;], 
+            password=config[&#34;password&#34;], 
+            database=config[&#34;schema&#34;], 
+            port=config[&#34;port&#34;]
+        )
+        cursor = database.cursor(dictionary=True)
+        cursor.execute(query)
+        data = cursor.fetchall()[0]
+        database.disconnect()
+
+        return data
+        
+    except Exception as e:
+        print(&#34;CRITICAL: Error encountered whilst attempting to connect to the database! \n&#34;, e)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="swordie_db.character.Character.ap"><code class="name">var <span class="ident">ap</span></code></dt>
@@ -2112,33 +2207,39 @@ Returns None if User ID is not found</p>
 <span>def <span class="ident">init_inv_id</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Fetch a dictionary of user attributes from Swordie's DB and use it to instantiate a new (custom) Inventory object</p>
+<p>(Stipulated algorithm for unfinished sequence)
+Runs near the end of Character::<strong>init</strong>(char_stats, database_config).
+Uses the Character ID associated with the character instance, and the Inventory class constructor to create
+a new Inventory object instance, with the relevant character attributes from the database.</p>
+<h2 id="raises">Raises</h2>
+<p>Generic error on failure - handled by the Character::get_db() method</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def init_inv_id(self):
-    try:
-        host = self._database_config[&#34;host&#34;]
-        user = self._database_config[&#34;user&#34;]
-        password = self._database_config[&#34;password&#34;]
-        schema = self._database_config[&#34;schema&#34;]
-        port = self._database_config[&#34;port&#34;]
+    &#34;&#34;&#34;Fetch a dictionary of user attributes from Swordie&#39;s DB and use it to instantiate a new (custom) Inventory object
 
-        database = con.connect(host=host, user=user, password=password, database=schema, port=port)
-        cursor = database.cursor(dictionary=True)
-        cursor.execute(f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;)
-        inventory_ids = cursor.fetchall()[0]
-        database.disconnect()
+    (Stipulated algorithm for unfinished sequence)
+    Runs near the end of Character::__init__(char_stats, database_config).
+    Uses the Character ID associated with the character instance, and the Inventory class constructor to create
+    a new Inventory object instance, with the relevant character attributes from the database.
 
-        self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
-        self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
-        self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
-        self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
-        self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]
-
-    except Exception as e:
-        print(&#34;[ERROR] Error trying to obtain assign inventory ids.&#34;, e)</code></pre>
+    Raises:
+        Generic error on failure - handled by the Character::get_db() method
+    &#34;&#34;&#34;
+    inventory_ids = self.get_db(
+        self._database_config,
+        f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
+        f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
+    )  # The row will always be 0 because there should be no characters with the same ID
+    
+    self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
+    self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
+    self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
+    self._install_inv_id = inventory_ids[&#34;installinventory&#34;]
+    self._cash_inv_id = inventory_ids[&#34;cashinventory&#34;]</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.init_stats"><code class="name flex">
@@ -2204,7 +2305,7 @@ a new User object instance, with the relevant user attributes from the database.
 <h2 id="returns">Returns</h2>
 <p>User</p>
 <h2 id="raises">Raises</h2>
-<p>Generic error on failure</p></div>
+<p>Generic error on failure - handled by the Character::get_db() method</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2219,32 +2320,17 @@ a new User object instance, with the relevant user attributes from the database.
     Returns:
         User
     Raises:
-        Generic error on failure
+        Generic error on failure - handled by the Character::get_db() method
     &#34;&#34;&#34;
-
     user_id = self.get_user_id()
+    
+    user_stats = self.get_db(
+        self._database_config,
+        f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;
+    )  # The row will always be 0 because there should be no characters with the same name
 
-    try:
-        host = self._database_config[&#34;host&#34;]
-        user = self._database_config[&#34;user&#34;]
-        password = self._database_config[&#34;password&#34;]
-        schema = self._database_config[&#34;schema&#34;]
-        port = self._database_config[&#34;port&#34;]
-
-        database = con.connect(host=host, user=user, password=password, database=schema, port=port)
-
-        cursor = database.cursor(dictionary=True)
-
-        cursor.execute(f&#34;SELECT * FROM users WHERE id = &#39;{user_id}&#39;&#34;)
-
-        user_stats = cursor.fetchall()[0]
-        database.disconnect()
-        # The row will always be 0 because there should be no characters with the same name
-        user = User(user_stats, self.database_config)
-        return user
-
-    except Exception as e:
-        print(&#34;[ERROR] Error trying to retrieve User Data.&#34;, e)</code></pre>
+    user = User(user_stats, self.database_config)
+    return user</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.set_stat_by_column"><code class="name flex">
@@ -2364,6 +2450,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.exp" href="#swordie_db.character.Character.exp">exp</a></code></li>
 <li><code><a title="swordie_db.character.Character.face" href="#swordie_db.character.Character.face">face</a></code></li>
 <li><code><a title="swordie_db.character.Character.fame" href="#swordie_db.character.Character.fame">fame</a></code></li>
+<li><code><a title="swordie_db.character.Character.get_db" href="#swordie_db.character.Character.get_db">get_db</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_job_name" href="#swordie_db.character.Character.get_job_name">get_job_name</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_primary_stats" href="#swordie_db.character.Character.get_primary_stats">get_primary_stats</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_stat_by_column" href="#swordie_db.character.Character.get_stat_by_column">get_stat_by_column</a></code></li>
