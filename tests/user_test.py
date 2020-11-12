@@ -55,9 +55,8 @@ def test_fetch_user_id(user):
 def test_fetch_vote_points(user):
 	assert user.vote_points == 0, f"Error encountered whilst fetching Vote Points: \nExpected: 0 (Int); Encountered: {user.vote_points}, Type: {type(user.vote_points)}"
 
-# Not yet implemented
-# def test_fetch_nx(user):
-# 	 assert user.nx == 0, f"Error encountered whilst fetching NX: \nExpected: 0 (Int); Encountered: {user.nx}, Type: {type(user.nx)}"
+def test_fetch_nx(user):
+	assert user.nx_prepaid == 0, f"Error encountered whilst fetching NX: \nExpected: 0 (Int); Encountered: {user.nx_prepaid}, Type: {type(user.nx_prepaid)}"
 
 def test_fetch_stat_by_column(user):
 	assert user.get_stat_by_column("gender") == 0, f"Error encountered whilst fetching gender: \nExpected: 0 (Int); Encountered: {user.get_stat_by_column('gender')}, Type: {type(user.get_stat_by_column('gender'))}"
@@ -117,3 +116,13 @@ def test_vp_changes(user, before, delta, expected):
 	user.add_vote_points(delta)
 	assert user.vote_points == expected, f"Error encountered whilst setting VP count: \nExpected: {expected} (String); Encountered: {user.vote_points}, Type: {type(user.vote_points)}"
 	user.vote_points = 0
+
+@pytest.mark.parametrize("before, delta, expected",[
+	(314159, 2827433, 3141592),
+])
+def test_nx_changes(user, before, delta, expected):
+	user.nx_prepaid = before
+	assert user.nx_prepaid == before, f"Error encountered whilst setting VP count: \nExpected: {before} (String); Encountered: {user.nx_prepaid}, Type: {type(user.nx_prepaid)}"
+	user.add_nx_prepaid(delta)
+	assert user.nx_prepaid == expected, f"Error encountered whilst setting VP count: \nExpected: {expected} (String); Encountered: {user.nx_prepaid}, Type: {type(user.nx_prepaid)}"
+	user.nx_prepaid = 0
