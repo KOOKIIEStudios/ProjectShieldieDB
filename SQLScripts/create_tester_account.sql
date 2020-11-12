@@ -1,7 +1,7 @@
 -- Create admin tester user with User ID of 90,001
-INSERT INTO `users` (id, votepoints, donationpoints, maplePoints, nxPrepaid, nblockreason, pblockreason, 
+INSERT INTO `users` (id, banReason, votepoints, donationpoints, maplePoints, nxPrepaid, nblockreason, pblockreason, 
 `name`, `password`, accounttype, chatunblockdate, pic, characterslots)
-VALUES (90001, 0, 0, 0, 0, 0, 3, 
+VALUES (90001, 'Lorem Ipsum', 0, 0, 0, 0, 0, 3, 
 'tester', 'lorem', 4, 0, '111111', 40)
 ON DUPLICATE KEY UPDATE votepoints=0, donationpoints=0, maplePoints=0, nxPrepaid=0, nblockreason=0, pblockreason=3, 
 `name`='tester', `password`='lorem', accounttype=4, chatunblockdate=0, pic='111111';
