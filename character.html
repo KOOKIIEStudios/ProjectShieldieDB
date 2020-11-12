@@ -70,6 +70,7 @@ class Character:
         max_mp: Integer, representing character Max MP stat pool
         ap: Integer, representing character free Ability Points (AP) pool
         sp: Integer, representing character free SP points pool
+        equip_inv_id: Integer, representing the &#34;equip&#34; inventory id
         equipped_inv_id: Integer, representing the &#34;equipped&#34; (i.e. Hotkey &#34;E&#34; in-game) inventory id
         consume_inv_id: Integer, representing &#34;consume&#34; (aka USE) inventory id
         etc_inv_id: Integer, representing &#34;etc&#34; (aka ETC) inventory id
@@ -121,6 +122,7 @@ class Character:
         self.init_stats()
 
         # These attributes are separate from characterstats table in database
+        self._equip_inv_id = 0
         self._equipped_inv_id = 0
         self._consume_inv_id = 0
         self._etc_inv_id = 0
@@ -210,7 +212,8 @@ class Character:
             f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
             f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
         )  # The row will always be 0 because there should be no characters with the same ID
-        
+
+        self._equip_inv_id = inventory_ids[&#34;equipinventory&#34;]
         self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
         self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
         self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
@@ -582,6 +585,10 @@ class Character:
     @property
     def cash_inv_id(self):
         return self._cash_inv_id
+
+    @property
+    def equip_inv_id(self):
+        return self._equip_inv_id
 
     def get_user_id(self):
         &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
@@ -739,6 +746,8 @@ This class contains the appropriate getter and setter methods for said attribute
 <dd>Integer, representing character free Ability Points (AP) pool</dd>
 <dt><strong><code>sp</code></strong></dt>
 <dd>Integer, representing character free SP points pool</dd>
+<dt><strong><code>equip_inv_id</code></strong></dt>
+<dd>Integer, representing the "equip" inventory id</dd>
 <dt><strong><code>equipped_inv_id</code></strong></dt>
 <dd>Integer, representing the "equipped" (i.e. Hotkey "E" in-game) inventory id</dd>
 <dt><strong><code>consume_inv_id</code></strong></dt>
@@ -790,6 +799,7 @@ This class contains the appropriate getter and setter methods for said attribute
         max_mp: Integer, representing character Max MP stat pool
         ap: Integer, representing character free Ability Points (AP) pool
         sp: Integer, representing character free SP points pool
+        equip_inv_id: Integer, representing the &#34;equip&#34; inventory id
         equipped_inv_id: Integer, representing the &#34;equipped&#34; (i.e. Hotkey &#34;E&#34; in-game) inventory id
         consume_inv_id: Integer, representing &#34;consume&#34; (aka USE) inventory id
         etc_inv_id: Integer, representing &#34;etc&#34; (aka ETC) inventory id
@@ -841,6 +851,7 @@ This class contains the appropriate getter and setter methods for said attribute
         self.init_stats()
 
         # These attributes are separate from characterstats table in database
+        self._equip_inv_id = 0
         self._equipped_inv_id = 0
         self._consume_inv_id = 0
         self._etc_inv_id = 0
@@ -930,7 +941,8 @@ This class contains the appropriate getter and setter methods for said attribute
             f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
             f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
         )  # The row will always be 0 because there should be no characters with the same ID
-        
+
+        self._equip_inv_id = inventory_ids[&#34;equipinventory&#34;]
         self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
         self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
         self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
@@ -1302,6 +1314,10 @@ This class contains the appropriate getter and setter methods for said attribute
     @property
     def cash_inv_id(self):
         return self._cash_inv_id
+
+    @property
+    def equip_inv_id(self):
+        return self._equip_inv_id
 
     def get_user_id(self):
         &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
@@ -1523,6 +1539,18 @@ def database_config(self):
 <pre><code class="python">@property
 def dex(self):
     return self._dex</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.equip_inv_id"><code class="name">var <span class="ident">equip_inv_id</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def equip_inv_id(self):
+    return self._equip_inv_id</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.equipped_inv_id"><code class="name">var <span class="ident">equipped_inv_id</span></code></dt>
@@ -2234,7 +2262,8 @@ a new Inventory object instance, with the relevant character attributes from the
         f&#34;SELECT equippedinventory, consumeinventory, etcinventory, installinventory, cashinventory &#34;
         f&#34;FROM characters WHERE id = &#39;{self.character_id}&#39;&#34;
     )  # The row will always be 0 because there should be no characters with the same ID
-    
+
+    self._equip_inv_id = inventory_ids[&#34;equipinventory&#34;]
     self._equipped_inv_id = inventory_ids[&#34;equippedinventory&#34;]
     self._consume_inv_id = inventory_ids[&#34;consumeinventory&#34;]
     self._etc_inv_id = inventory_ids[&#34;etcinventory&#34;]
@@ -2445,6 +2474,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.consume_inv_id" href="#swordie_db.character.Character.consume_inv_id">consume_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.database_config" href="#swordie_db.character.Character.database_config">database_config</a></code></li>
 <li><code><a title="swordie_db.character.Character.dex" href="#swordie_db.character.Character.dex">dex</a></code></li>
+<li><code><a title="swordie_db.character.Character.equip_inv_id" href="#swordie_db.character.Character.equip_inv_id">equip_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.equipped_inv_id" href="#swordie_db.character.Character.equipped_inv_id">equipped_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.etc_inv_id" href="#swordie_db.character.Character.etc_inv_id">etc_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.exp" href="#swordie_db.character.Character.exp">exp</a></code></li>
