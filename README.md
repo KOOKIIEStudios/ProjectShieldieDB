@@ -23,5 +23,7 @@ View API Docs: [here](https://kookiiestudios.github.io/ProjectShieldieDB/).
 Automated unit tests for Character handling checks completed:  
 ![](https://i.imgur.com/aXl4kch.png)  
 
-Automated unit tests for User handling checks pending...  
+Automated unit tests for User handling checks completed:  
+![](https://i.imgur.com/w4oEhPv.png)
+
 Automated unit tests for Inventory handling checks pending...  
