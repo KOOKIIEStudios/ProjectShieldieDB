@@ -166,46 +166,45 @@ def test_exp_changes(char, before, delta, expected):
 	assert char.exp == expected, f"EXP test adding failed! Expected: {expected}; EXP amount: {char.exp}; Type: {type(char.exp)}"
 	char.exp = "0"  # reset to baseline
 
-
-print("\nChecking the ability to write the following information to DB: ")
-print("    > STR; DEX; INT; LUK. \n")
-# Set values for STR, DEX, INT, LUK
-char.strength = 31
-char.dex = 31
-char.inte = 31
-char.luk = 31
-
 @pytest.mark.parametrize("before, delta, expected",[
 	(31, 1, 32),
 ])
-def test_strength_changes(char, before, delta, expected):
+def test_str_changes(char, before, delta, expected):
 	char.strength = before
 	assert char.strength == before, f"STR setting test failed! Expected: {before}; STR amount: {char.strength}; Type: {type(char.strength)}"
 	char.add_str(delta)
 	assert char.strength == expected, f"STR adding test failed! Expected: {expected}; STR amount: {char.strength}; Type: {type(char.strength)}"
 	char.strength = 12  # reset to baseline
 
-dex = char.dex  # re-fetch data
-assert dex == 31, f"DEX setting test failed! Expected: {before}; DEX amount: {dex}; Type: {type(dex)}"
-char.add_dex(1)
-dex = char.dex  # re-fetch data
-assert dex == 32, f"DEX adding test failed! Expected: {expected}; DEX amount: {dex}; Type: {type(dex)}"
-char.dex = 5  # reset to baseline
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_dex_changes(char, before, delta, expected):
+	char.dex = before
+	assert char.dex == before, f"DEX setting test failed! Expected: {before}; DEX amount: {char.dex}; Type: {type(char.dex)}"
+	char.add_dex(delta)
+	assert char.dex == expected, f"DEX adding test failed! Expected: {expected}; DEX amount: {char.dex}; Type: {type(char.dex)}"
+	char.dex = 5  # reset to baseline
 
-inte = char.inte  # re-fetch data
-assert inte == 31, f"INT setting test failed! Expected: {before}; INT amount: {inte}; Type: {type(inte)}"
-char.add_inte(1)
-inte = char.inte  # re-fetch data
-assert inte == 32, f"INT adding test failed! Expected: {expected}; INT amount: {inte}; Type: {type(inte)}"
-char.inte = 4  # reset to baseline
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_int_changes(char, before, delta, expected):
+	char.inte = before
+	assert char.inte == before, f"INT setting test failed! Expected: {before}; INT amount: {char.inte}; Type: {type(char.inte)}"
+	char.add_inte(delta)
+	assert char.inte == expected, f"INT adding test failed! Expected: {expected}; INT amount: {char.inte}; Type: {type(char.inte)}"
+	char.inte = 4  # reset to baseline
 
-luk = char.luk  # re-fetch data
-assert luk == 31, f"LUK setting test failed! Expected: {before}; LUK amount: {luk}; Type: {type(luk)}"
-char.add_luk(1)
-luk = char.luk  # re-fetch data
-assert luk == 32, f"LUK adding test failed! Expected: {expected}; LUK amount: {luk}; Type: {type(luk)}"
-char.luk = 4  # reset to baseline
-
+@pytest.mark.parametrize("before, delta, expected",[
+	(31, 1, 32),
+])
+def test_luk_changes(char, before, delta, expected):
+	char.luk = before
+	assert char.luk == before, f"LUK setting test failed! Expected: {before}; LUK amount: {char.luk}; Type: {type(char.luk)}"
+	char.add_luk(delta)
+	assert char.luk == expected, f"LUK adding test failed! Expected: {expected}; LUK amount: {char.luk}; Type: {type(char.luk)}"
+	char.luk = 4  # reset to baseline
 
 print("\nChecking the ability to write the following information to DB: ")
 print("    > HP; MP; AP; SP. \n")
