@@ -120,9 +120,9 @@ class Character:
     def init_stats(self):
         &#34;&#34;&#34;Given a dictionary of stats from Swordie&#39;s DB we add them to Character object&#39;s attributes
 
-        Runs at the end of Character::__init__(char_stats, database_config).
-        It assigns the character stats in char_stats to their respective protected attributes belonging to
-        the Character object.
+        Runs near the end of Character::__init__(char_stats, database_config).
+        It assigns the character attributes in char_stats to their respective protected attributes belonging to
+        the Character object instance.
         &#34;&#34;&#34;
         self._vague_id = self._stats[&#34;id&#34;]
         self._character_id = self._stats[&#34;characterid&#34;]
@@ -157,9 +157,16 @@ class Character:
         self._sub_job = self._stats[&#34;subjob&#34;]
 
     def init_user(self):
-        &#34;&#34;&#34;
-        A method that will automatically create a user object connected to the character&#39;s user attribute
-        :return: User
+        &#34;&#34;&#34;Fetch a dictionary of user attributes from Swordie&#39;s DB and use it to instantiate a new User object
+
+        Runs at the end of Character::__init__(char_stats, database_config).
+        Checks the User ID associated with the character instance, and uses the User class constructor to create
+        a new User object instance, with the relevant user attributes from the database.
+
+        Returns:
+            User
+        Raises:
+            Generic error on failure
         &#34;&#34;&#34;
 
         user_id = self.get_user_id()
@@ -495,9 +502,15 @@ class Character:
         return self._user
 
     def get_user_id(self):
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+
         Created this method to avoid circular imports by using SwordieDB&#39;s get_user_id
-        :return:
+
+        Returns:
+            Int, representing the User ID
+            Returns None if User ID is not found
+        Raises:
+            Generic error on failure
         &#34;&#34;&#34;
         host = self._database_config[&#34;host&#34;]
         user = self._database_config[&#34;user&#34;]
@@ -530,14 +543,14 @@ class Character:
         Grabs the database attributes provided through the class constructor.
         Uses these attributes to attempt a database connection.
         Attempts to update the field represented by the provided column in characterstats, with the provided value.
-        Not recommended to use this alone, as it won&#39;t update the character object which this was used from
+        Not recommended to use this alone, as it won&#39;t update the character object which this was used from.
 
         Args:
             value: int or string, representing the value to be set in the database
             column: string, representing the column in the database that is to be updated
 
         Returns:
-            A boolean representing whether the operation was successful.
+            A boolean representing whether the operation was successful
 
         Raises:
             SQL Error 2003: Can&#39;t cannect to DB
@@ -575,9 +588,7 @@ class Character:
             string, representing the value in the database associated with the provided column
 
         Raises:
-            SQL Error 2003: Can&#39;t cannect to DB
-            WinError 10060: No response from DB
-            List index out of range: Wrong column name
+            Generic error on failure
         &#34;&#34;&#34;
         try:
             return self.stats[column]
@@ -737,9 +748,9 @@ This class contains the appropriate getter and setter methods for said attribute
     def init_stats(self):
         &#34;&#34;&#34;Given a dictionary of stats from Swordie&#39;s DB we add them to Character object&#39;s attributes
 
-        Runs at the end of Character::__init__(char_stats, database_config).
-        It assigns the character stats in char_stats to their respective protected attributes belonging to
-        the Character object.
+        Runs near the end of Character::__init__(char_stats, database_config).
+        It assigns the character attributes in char_stats to their respective protected attributes belonging to
+        the Character object instance.
         &#34;&#34;&#34;
         self._vague_id = self._stats[&#34;id&#34;]
         self._character_id = self._stats[&#34;characterid&#34;]
@@ -774,9 +785,16 @@ This class contains the appropriate getter and setter methods for said attribute
         self._sub_job = self._stats[&#34;subjob&#34;]
 
     def init_user(self):
-        &#34;&#34;&#34;
-        A method that will automatically create a user object connected to the character&#39;s user attribute
-        :return: User
+        &#34;&#34;&#34;Fetch a dictionary of user attributes from Swordie&#39;s DB and use it to instantiate a new User object
+
+        Runs at the end of Character::__init__(char_stats, database_config).
+        Checks the User ID associated with the character instance, and uses the User class constructor to create
+        a new User object instance, with the relevant user attributes from the database.
+
+        Returns:
+            User
+        Raises:
+            Generic error on failure
         &#34;&#34;&#34;
 
         user_id = self.get_user_id()
@@ -1112,9 +1130,15 @@ This class contains the appropriate getter and setter methods for said attribute
         return self._user
 
     def get_user_id(self):
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+
         Created this method to avoid circular imports by using SwordieDB&#39;s get_user_id
-        :return:
+
+        Returns:
+            Int, representing the User ID
+            Returns None if User ID is not found
+        Raises:
+            Generic error on failure
         &#34;&#34;&#34;
         host = self._database_config[&#34;host&#34;]
         user = self._database_config[&#34;user&#34;]
@@ -1147,14 +1171,14 @@ This class contains the appropriate getter and setter methods for said attribute
         Grabs the database attributes provided through the class constructor.
         Uses these attributes to attempt a database connection.
         Attempts to update the field represented by the provided column in characterstats, with the provided value.
-        Not recommended to use this alone, as it won&#39;t update the character object which this was used from
+        Not recommended to use this alone, as it won&#39;t update the character object which this was used from.
 
         Args:
             value: int or string, representing the value to be set in the database
             column: string, representing the column in the database that is to be updated
 
         Returns:
-            A boolean representing whether the operation was successful.
+            A boolean representing whether the operation was successful
 
         Raises:
             SQL Error 2003: Can&#39;t cannect to DB
@@ -1192,9 +1216,7 @@ This class contains the appropriate getter and setter methods for said attribute
             string, representing the value in the database associated with the provided column
 
         Raises:
-            SQL Error 2003: Can&#39;t cannect to DB
-            WinError 10060: No response from DB
-            List index out of range: Wrong column name
+            Generic error on failure
         &#34;&#34;&#34;
         try:
             return self.stats[column]
@@ -1806,14 +1828,7 @@ def user(self):
 <h2 id="returns">Returns</h2>
 <p>string, representing the value in the database associated with the provided column</p>
 <h2 id="raises">Raises</h2>
-<dl>
-<dt><code>SQL Error 2003</code></dt>
-<dd>Can't cannect to DB</dd>
-<dt><code>WinError 10060</code></dt>
-<dd>No response from DB</dd>
-<dt><code>List index out</code> of <code>range</code></dt>
-<dd>Wrong column name</dd>
-</dl></div>
+<p>Generic error on failure</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1828,9 +1843,7 @@ def user(self):
         string, representing the value in the database associated with the provided column
 
     Raises:
-        SQL Error 2003: Can&#39;t cannect to DB
-        WinError 10060: No response from DB
-        List index out of range: Wrong column name
+        Generic error on failure
     &#34;&#34;&#34;
     try:
         return self.stats[column]
@@ -1843,16 +1856,27 @@ def user(self):
 <span>def <span class="ident">get_user_id</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Created this method to avoid circular imports by using SwordieDB's get_user_id
-:return:</p></div>
+<div class="desc"><p>Queries the database to obtain the User ID associated with this character instance</p>
+<p>Created this method to avoid circular imports by using SwordieDB's get_user_id</p>
+<h2 id="returns">Returns</h2>
+<p>Int, representing the User ID
+Returns None if User ID is not found</p>
+<h2 id="raises">Raises</h2>
+<p>Generic error on failure</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_user_id(self):
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+
     Created this method to avoid circular imports by using SwordieDB&#39;s get_user_id
-    :return:
+
+    Returns:
+        Int, representing the User ID
+        Returns None if User ID is not found
+    Raises:
+        Generic error on failure
     &#34;&#34;&#34;
     host = self._database_config[&#34;host&#34;]
     user = self._database_config[&#34;user&#34;]
@@ -1885,9 +1909,9 @@ def user(self):
 </code></dt>
 <dd>
 <div class="desc"><p>Given a dictionary of stats from Swordie's DB we add them to Character object's attributes</p>
-<p>Runs at the end of Character::<strong>init</strong>(char_stats, database_config).
-It assigns the character stats in char_stats to their respective protected attributes belonging to
-the Character object.</p></div>
+<p>Runs near the end of Character::<strong>init</strong>(char_stats, database_config).
+It assigns the character attributes in char_stats to their respective protected attributes belonging to
+the Character object instance.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1895,9 +1919,9 @@ the Character object.</p></div>
 <pre><code class="python">def init_stats(self):
     &#34;&#34;&#34;Given a dictionary of stats from Swordie&#39;s DB we add them to Character object&#39;s attributes
 
-    Runs at the end of Character::__init__(char_stats, database_config).
-    It assigns the character stats in char_stats to their respective protected attributes belonging to
-    the Character object.
+    Runs near the end of Character::__init__(char_stats, database_config).
+    It assigns the character attributes in char_stats to their respective protected attributes belonging to
+    the Character object instance.
     &#34;&#34;&#34;
     self._vague_id = self._stats[&#34;id&#34;]
     self._character_id = self._stats[&#34;characterid&#34;]
@@ -1936,16 +1960,29 @@ the Character object.</p></div>
 <span>def <span class="ident">init_user</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A method that will automatically create a user object connected to the character's user attribute
-:return: User</p></div>
+<div class="desc"><p>Fetch a dictionary of user attributes from Swordie's DB and use it to instantiate a new User object</p>
+<p>Runs at the end of Character::<strong>init</strong>(char_stats, database_config).
+Checks the User ID associated with the character instance, and uses the User class constructor to create
+a new User object instance, with the relevant user attributes from the database.</p>
+<h2 id="returns">Returns</h2>
+<p>User</p>
+<h2 id="raises">Raises</h2>
+<p>Generic error on failure</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def init_user(self):
-    &#34;&#34;&#34;
-    A method that will automatically create a user object connected to the character&#39;s user attribute
-    :return: User
+    &#34;&#34;&#34;Fetch a dictionary of user attributes from Swordie&#39;s DB and use it to instantiate a new User object
+
+    Runs at the end of Character::__init__(char_stats, database_config).
+    Checks the User ID associated with the character instance, and uses the User class constructor to create
+    a new User object instance, with the relevant user attributes from the database.
+
+    Returns:
+        User
+    Raises:
+        Generic error on failure
     &#34;&#34;&#34;
 
     user_id = self.get_user_id()
@@ -1980,7 +2017,7 @@ the Character object.</p></div>
 <p>Grabs the database attributes provided through the class constructor.
 Uses these attributes to attempt a database connection.
 Attempts to update the field represented by the provided column in characterstats, with the provided value.
-Not recommended to use this alone, as it won't update the character object which this was used from</p>
+Not recommended to use this alone, as it won't update the character object which this was used from.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>value</code></strong></dt>
@@ -1989,7 +2026,7 @@ Not recommended to use this alone, as it won't update the character object which
 <dd>string, representing the column in the database that is to be updated</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>A boolean representing whether the operation was successful.</p>
+<p>A boolean representing whether the operation was successful</p>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>SQL Error 2003</code></dt>
@@ -2009,14 +2046,14 @@ Not recommended to use this alone, as it won't update the character object which
     Grabs the database attributes provided through the class constructor.
     Uses these attributes to attempt a database connection.
     Attempts to update the field represented by the provided column in characterstats, with the provided value.
-    Not recommended to use this alone, as it won&#39;t update the character object which this was used from
+    Not recommended to use this alone, as it won&#39;t update the character object which this was used from.
 
     Args:
         value: int or string, representing the value to be set in the database
         column: string, representing the column in the database that is to be updated
 
     Returns:
-        A boolean representing whether the operation was successful.
+        A boolean representing whether the operation was successful
 
     Raises:
         SQL Error 2003: Can&#39;t cannect to DB
