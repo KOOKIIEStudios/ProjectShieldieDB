@@ -46,7 +46,7 @@ def user_id():
 # Character info fetching tests
 def test_fetch_char_info(char):
 	assert char.name == "tester", f"Critical Error: Name test failed! Name: {char.name}; Type: {type(char.name)}"
-	assert char.meso == "0", f"Meso test failed! Meso count: {char.meso}; Type: {type(char.meso)}"
+	assert char.money == "0", f"Meso test failed! Meso count: {char.money}; Type: {type(char.money)}"
 	assert char.fame == 0, f"Fame test failed! Fame count: {char.fame}; Type: {type(char.fame)}"
 	job = char.get_job_name()  # return job name from ID via Hashmap; String
 	assert job == "Beginner", f"Job name test failed! Job name: {job}; Type: {type(job)}"
@@ -102,6 +102,7 @@ def test_fame_changes(char, before, delta, expected):
 	(10, 21, 31),
 ])
 def test_level_changes(char, before, delta, expected):
+	char.level = before
 	assert char.level == before, f"Character level setting test failed! Expected: {before}; Level count: {char.level}; Type: {type(char.level)}"
 	char.add_level(delta)  # Adds 21 to the existing count and saves to database
 	# character is now level 31
@@ -129,7 +130,7 @@ def test_name_changes(char, before, expected):
 ])
 def test_map_changes(char, before, expected):
 	char.map = expected
-	assert map == expected, f"Map ID setting test failed! Expected: {expected}; Map ID: {char.map}; Type: {type(char.map)}"
+	assert char.map == expected, f"Map ID setting test failed! Expected: {expected},{type(expected)}; Map ID: {char.map}; Type: {type(char.map)}"
 	char.map = before  # reset to baseline
 
 @pytest.mark.parametrize("before, expected",[
@@ -145,7 +146,7 @@ def test_face_changes(char, before, expected):
 ])
 def test_hair_changes(char, before, expected):
 	char.hair = expected
-	assert hair == expected, f"Hair ID setting test failed! Expected: {expected}; Hair ID: {char.hair}; Type: {type(char.hair)}"
+	assert char.hair == expected, f"Hair ID setting test failed! Expected: {expected}; Hair ID: {char.hair}; Type: {type(char.hair)}"
 	char.hair = before  # reset to baseline
 
 @pytest.mark.parametrize("before, expected",[
@@ -161,7 +162,7 @@ def test_skin_changes(char, before, expected):
 ])
 def test_exp_changes(char, before, delta, expected):
 	char.exp = before
-	assert exp == before, f"EXP test setting failed! Expected: {before}; EXP amount: {char.exp}; Type: {type(char.exp)}"
+	assert char.exp == before, f"EXP test setting failed! Expected: {before}; EXP amount: {char.exp}; Type: {type(char.exp)}"
 	char.add_exp(delta)
 	assert char.exp == expected, f"EXP test adding failed! Expected: {expected}; EXP amount: {char.exp}; Type: {type(char.exp)}"
 	char.exp = "0"  # reset to baseline
