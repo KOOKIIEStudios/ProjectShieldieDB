@@ -32,10 +32,25 @@ def test_is_in_equip(inventory, iterations):
 	for n in range(iterations):
 		inventory.has_item_in_equip(1002140)
 
+# Define new mthod here for comparision:
+#def test_other_method(inventory, iterations):
+# 	for n in range(iterations):
+		# New method goes here
+
+def time_method(method, iterations):
+  start = timer()
+  test_is_in_equip(inventory, iterations)
+  end = timer()
+  return start, end
+
 inventory = inventory()
 iterations = 100000  # 100,000 iterations
 print(f"Attempting {iterations} iterations for better precision")
-start = timer()
-test_is_in_equip(inventory, iterations)
-end = timer()
+start, end = time_method(test_is_in_equip, iterations)
 print(f"Time taken: {end - start}seconds") # Time in seconds, e.g. 5.38091952400282
+
+# Uncomment the following for new method:
+# print(f"Attempting {iterations} iterations for better precision")
+# start, end = time_method(test_other_method, iterations)
+# print(f"Time taken for new method: {end - start}seconds") # Time in seconds, e.g. 5.38091952400282
+
