@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
 <title>swordie_db.inventory API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="This module holds the Inventory class for the SwordieDB package …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,23 +22,58 @@
 <h1 class="title">Module <code>swordie_db.inventory</code></h1>
 </header>
 <section id="section-intro">
+<p>This module holds the Inventory class for the SwordieDB package.</p>
+<p>Copyright 2020 TEAM SPIRIT. All rights reserved.
+Use of this source code is governed by a MIT-style license that can be found in the LICENSE file.
+Refer to database.py or the project wiki on GitHub for usage examples.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import mysql.connector as con
+<pre><code class="python">&#34;&#34;&#34;This module holds the Inventory class for the SwordieDB package.
+
+Copyright 2020 TEAM SPIRIT. All rights reserved.
+Use of this source code is governed by a MIT-style license that can be found in the LICENSE file.
+Refer to database.py or the project wiki on GitHub for usage examples.
+&#34;&#34;&#34;
+import mysql.connector as con
 
 
 class Inventory:
+    &#34;&#34;&#34;Inventory object; quasi-models SwordieMS inventories.
+
+    The instance method SwordieDB::get_char_by_name(name) creates a Character object; as part of
+    swordie_db Charatcer object instantiation, an Inventory object instance containing inventory attributes of
+    the character with IGN &#34;name&#34; in the connected Swordie-based database is created.
+    This class contains the appropriate getter methods for said attributes.
+    As a consequence of the inherent complexity of MapleStory&#39;s item system, for safety reasons,
+    this module offers NO inventory-write operations (aka setters).
+
+    Attributes:
+        inventory_ids: dictionary, representing inventory IDs
+        equip_inv: dictionary of dictionaries, representing in-game items contained by the EQUIP tab
+        consume_inv: dictionary of dictionaries, representing in-game items contained by the USE tab
+        etc_inv: dictionary of dictionaries, representing in-game items contained by the ETC tab
+        install_inv: dictionary of dictionaries, representing in-game items contained by the SETUP tab
+        cash_inv: dictionary of dictionaries, representing in-game items contained by the CASH tab
+        equipped_inv: dictionary of dictionaries, representing in-game items currently equipped by the character
+    &#34;&#34;&#34;
 
     def __init__(self, inv_ids, db_config):
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Inventory object; quasi-models SwordieMS inventories.
 
-        :param inv_ids: dictionary
-        :param db_config: dictionary
+        Due to the inherent complexity of SwordieMS&#39;s iventory system, this Inventory object will
+        attempt to contain attributes of all 6 of SwordieMS&#39;s inventory types, using a custom object.
+        (Refer to Character::init_inventory_ids() for a list of inventory_types)
+        Every inventory attribute is a dictionary of dictionaries, where the Key is the bag index
+        (i.e. inventory type), and the Value is a dictionary modeling contents of the `items` table
+        in a Swordie-based database.
+        As a consequence of the inherent complexity of MapleStory&#39;s item system, for safety reasons,
+        this module offers NO inventory-write operations (only inventory-read operations).
 
-        Every inventory attribute is a dictionary where the key is the bag index of the item
-        The Value is a dictionary pertaining attributes from items table in Swordie DB
+        Args:
+            inv_ids: dictionary, representing inventory IDs
+            db_config: dictionary, containing database connection attributes
         &#34;&#34;&#34;
         self._inventory_ids = inv_ids
         self._database_config = db_config
@@ -83,6 +118,83 @@ class Inventory:
     def equipped_inv(self):
         return self._equipped_inv
 
+    @staticmethod
+    def has_item_in_inv_type(inv_type, item_id):
+        &#34;&#34;&#34;Checks whether the particular tab of the inventory has an item
+
+        Generic static method used by the other Inventory::has_item_in_XXX() methods, and the
+        Character::is_equipping() method.
+        Iterates through the dictionary of items associated with the specified tab, and check if
+        the provided item ID can be found as a value.
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        for bag_index in inv_type:
+            if int(inv_type[bag_index][&#39;itemid&#39;]) == item_id:
+                return True
+        return False
+
+    def has_item_in_equip(self, item_id):
+        &#34;&#34;&#34;Checks whether the EQUIP tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.equip_inv, item_id)
+
+    def has_item_in_consume(self, item_id):
+        &#34;&#34;&#34;Checks whether the USE tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.consume_inv, item_id)
+
+    def has_item_in_etc(self, item_id):
+        &#34;&#34;&#34;Checks whether the ETC tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.etc_inv, item_id)
+
+    def has_item_in_install(self, item_id):
+        &#34;&#34;&#34;Checks whether the SETUP tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.install_inv, item_id)
+
+    def has_item_in_cash(self, item_id):
+        &#34;&#34;&#34;Checks whether the CASH tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.cash_inv, item_id)
+
+    def is_equipping(self, item_id):
+        &#34;&#34;&#34;Checks whether the EQUIP window (i.e. Hotkey &#34;E&#34;) has an item (i.e. item is equipped)
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.equipped_inv, item_id)
+
     def init_equip_items(self):
         return self.load_inv(&#34;equip_inv_id&#34;)
 
@@ -102,11 +214,19 @@ class Inventory:
         return self.load_inv(&#34;install_inv_id&#34;)
 
     def load_inv(self, inventory_type):
-        &#34;&#34;&#34;
-        Given an inventory_type, load every item in it.
+        &#34;&#34;&#34;Given an inventory_type, fetch every item associated with it.
+
+        Generic instance method used by Character::init_XXX_inv() methods.
         Refer to Character::init_inventory_ids() for a list of inventory_types.
-        :param inventory_type: string
-        :return: dictionary
+
+        Args:
+            inventory_type: string, representing the inventory type
+
+        Returns:
+            dictionary, representing all the in-game items that in the specified inventory type
+
+        Raises:
+            Generic error
         &#34;&#34;&#34;
         try:
             database = con.connect(
@@ -138,7 +258,7 @@ class Inventory:
                 inv[bag_index] = item_stats
             return inv
         except Exception as e:
-            print(&#34;Critical: Error occured when initializing equip items&#34;, e)</code></pre>
+            print(&#34;CRITICAL: Error occurred when initializing inventory items: \n&#34;, e)</code></pre>
 </details>
 </section>
 <section>
@@ -155,24 +275,85 @@ class Inventory:
 <span>(</span><span>inv_ids, db_config)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:param inv_ids: dictionary
-:param db_config: dictionary</p>
-<p>Every inventory attribute is a dictionary where the key is the bag index of the item
-The Value is a dictionary pertaining attributes from items table in Swordie DB</p></div>
+<div class="desc"><p>Inventory object; quasi-models SwordieMS inventories.</p>
+<p>The instance method SwordieDB::get_char_by_name(name) creates a Character object; as part of
+swordie_db Charatcer object instantiation, an Inventory object instance containing inventory attributes of
+the character with IGN "name" in the connected Swordie-based database is created.
+This class contains the appropriate getter methods for said attributes.
+As a consequence of the inherent complexity of MapleStory's item system, for safety reasons,
+this module offers NO inventory-write operations (aka setters).</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>inventory_ids</code></strong></dt>
+<dd>dictionary, representing inventory IDs</dd>
+<dt><strong><code>equip_inv</code></strong></dt>
+<dd>dictionary of dictionaries, representing in-game items contained by the EQUIP tab</dd>
+<dt><strong><code>consume_inv</code></strong></dt>
+<dd>dictionary of dictionaries, representing in-game items contained by the USE tab</dd>
+<dt><strong><code>etc_inv</code></strong></dt>
+<dd>dictionary of dictionaries, representing in-game items contained by the ETC tab</dd>
+<dt><strong><code>install_inv</code></strong></dt>
+<dd>dictionary of dictionaries, representing in-game items contained by the SETUP tab</dd>
+<dt><strong><code>cash_inv</code></strong></dt>
+<dd>dictionary of dictionaries, representing in-game items contained by the CASH tab</dd>
+<dt><strong><code>equipped_inv</code></strong></dt>
+<dd>dictionary of dictionaries, representing in-game items currently equipped by the character</dd>
+</dl>
+<p>Inventory object; quasi-models SwordieMS inventories.</p>
+<p>Due to the inherent complexity of SwordieMS's iventory system, this Inventory object will
+attempt to contain attributes of all 6 of SwordieMS's inventory types, using a custom object.
+(Refer to Character::init_inventory_ids() for a list of inventory_types)
+Every inventory attribute is a dictionary of dictionaries, where the Key is the bag index
+(i.e. inventory type), and the Value is a dictionary modeling contents of the <code>items</code> table
+in a Swordie-based database.
+As a consequence of the inherent complexity of MapleStory's item system, for safety reasons,
+this module offers NO inventory-write operations (only inventory-read operations).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>inv_ids</code></strong></dt>
+<dd>dictionary, representing inventory IDs</dd>
+<dt><strong><code>db_config</code></strong></dt>
+<dd>dictionary, containing database connection attributes</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Inventory:
+    &#34;&#34;&#34;Inventory object; quasi-models SwordieMS inventories.
+
+    The instance method SwordieDB::get_char_by_name(name) creates a Character object; as part of
+    swordie_db Charatcer object instantiation, an Inventory object instance containing inventory attributes of
+    the character with IGN &#34;name&#34; in the connected Swordie-based database is created.
+    This class contains the appropriate getter methods for said attributes.
+    As a consequence of the inherent complexity of MapleStory&#39;s item system, for safety reasons,
+    this module offers NO inventory-write operations (aka setters).
+
+    Attributes:
+        inventory_ids: dictionary, representing inventory IDs
+        equip_inv: dictionary of dictionaries, representing in-game items contained by the EQUIP tab
+        consume_inv: dictionary of dictionaries, representing in-game items contained by the USE tab
+        etc_inv: dictionary of dictionaries, representing in-game items contained by the ETC tab
+        install_inv: dictionary of dictionaries, representing in-game items contained by the SETUP tab
+        cash_inv: dictionary of dictionaries, representing in-game items contained by the CASH tab
+        equipped_inv: dictionary of dictionaries, representing in-game items currently equipped by the character
+    &#34;&#34;&#34;
 
     def __init__(self, inv_ids, db_config):
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;Inventory object; quasi-models SwordieMS inventories.
 
-        :param inv_ids: dictionary
-        :param db_config: dictionary
+        Due to the inherent complexity of SwordieMS&#39;s iventory system, this Inventory object will
+        attempt to contain attributes of all 6 of SwordieMS&#39;s inventory types, using a custom object.
+        (Refer to Character::init_inventory_ids() for a list of inventory_types)
+        Every inventory attribute is a dictionary of dictionaries, where the Key is the bag index
+        (i.e. inventory type), and the Value is a dictionary modeling contents of the `items` table
+        in a Swordie-based database.
+        As a consequence of the inherent complexity of MapleStory&#39;s item system, for safety reasons,
+        this module offers NO inventory-write operations (only inventory-read operations).
 
-        Every inventory attribute is a dictionary where the key is the bag index of the item
-        The Value is a dictionary pertaining attributes from items table in Swordie DB
+        Args:
+            inv_ids: dictionary, representing inventory IDs
+            db_config: dictionary, containing database connection attributes
         &#34;&#34;&#34;
         self._inventory_ids = inv_ids
         self._database_config = db_config
@@ -217,6 +398,83 @@ The Value is a dictionary pertaining attributes from items table in Swordie DB</
     def equipped_inv(self):
         return self._equipped_inv
 
+    @staticmethod
+    def has_item_in_inv_type(inv_type, item_id):
+        &#34;&#34;&#34;Checks whether the particular tab of the inventory has an item
+
+        Generic static method used by the other Inventory::has_item_in_XXX() methods, and the
+        Character::is_equipping() method.
+        Iterates through the dictionary of items associated with the specified tab, and check if
+        the provided item ID can be found as a value.
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        for bag_index in inv_type:
+            if int(inv_type[bag_index][&#39;itemid&#39;]) == item_id:
+                return True
+        return False
+
+    def has_item_in_equip(self, item_id):
+        &#34;&#34;&#34;Checks whether the EQUIP tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.equip_inv, item_id)
+
+    def has_item_in_consume(self, item_id):
+        &#34;&#34;&#34;Checks whether the USE tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.consume_inv, item_id)
+
+    def has_item_in_etc(self, item_id):
+        &#34;&#34;&#34;Checks whether the ETC tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.etc_inv, item_id)
+
+    def has_item_in_install(self, item_id):
+        &#34;&#34;&#34;Checks whether the SETUP tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.install_inv, item_id)
+
+    def has_item_in_cash(self, item_id):
+        &#34;&#34;&#34;Checks whether the CASH tab of the inventory has an item
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.cash_inv, item_id)
+
+    def is_equipping(self, item_id):
+        &#34;&#34;&#34;Checks whether the EQUIP window (i.e. Hotkey &#34;E&#34;) has an item (i.e. item is equipped)
+
+        Uses Inventory::has_item_in_inv_type()
+
+        Returns:
+            Boolean, representing whether the specified item was found
+        &#34;&#34;&#34;
+        return self.has_item_in_inv_type(self.equipped_inv, item_id)
+
     def init_equip_items(self):
         return self.load_inv(&#34;equip_inv_id&#34;)
 
@@ -236,11 +494,19 @@ The Value is a dictionary pertaining attributes from items table in Swordie DB</
         return self.load_inv(&#34;install_inv_id&#34;)
 
     def load_inv(self, inventory_type):
-        &#34;&#34;&#34;
-        Given an inventory_type, load every item in it.
+        &#34;&#34;&#34;Given an inventory_type, fetch every item associated with it.
+
+        Generic instance method used by Character::init_XXX_inv() methods.
         Refer to Character::init_inventory_ids() for a list of inventory_types.
-        :param inventory_type: string
-        :return: dictionary
+
+        Args:
+            inventory_type: string, representing the inventory type
+
+        Returns:
+            dictionary, representing all the in-game items that in the specified inventory type
+
+        Raises:
+            Generic error
         &#34;&#34;&#34;
         try:
             database = con.connect(
@@ -272,8 +538,44 @@ The Value is a dictionary pertaining attributes from items table in Swordie DB</
                 inv[bag_index] = item_stats
             return inv
         except Exception as e:
-            print(&#34;Critical: Error occured when initializing equip items&#34;, e)</code></pre>
+            print(&#34;CRITICAL: Error occurred when initializing inventory items: \n&#34;, e)</code></pre>
 </details>
+<h3>Static methods</h3>
+<dl>
+<dt id="swordie_db.inventory.Inventory.has_item_in_inv_type"><code class="name flex">
+<span>def <span class="ident">has_item_in_inv_type</span></span>(<span>inv_type, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the particular tab of the inventory has an item</p>
+<p>Generic static method used by the other Inventory::has_item_in_XXX() methods, and the
+Character::is_equipping() method.
+Iterates through the dictionary of items associated with the specified tab, and check if
+the provided item ID can be found as a value.</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def has_item_in_inv_type(inv_type, item_id):
+    &#34;&#34;&#34;Checks whether the particular tab of the inventory has an item
+
+    Generic static method used by the other Inventory::has_item_in_XXX() methods, and the
+    Character::is_equipping() method.
+    Iterates through the dictionary of items associated with the specified tab, and check if
+    the provided item ID can be found as a value.
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    for bag_index in inv_type:
+        if int(inv_type[bag_index][&#39;itemid&#39;]) == item_id:
+            return True
+    return False</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="swordie_db.inventory.Inventory.cash_inv"><code class="name">var <span class="ident">cash_inv</span></code></dt>
@@ -375,6 +677,121 @@ def inventory_ids(self):
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="swordie_db.inventory.Inventory.has_item_in_cash"><code class="name flex">
+<span>def <span class="ident">has_item_in_cash</span></span>(<span>self, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the CASH tab of the inventory has an item</p>
+<p>Uses Inventory::has_item_in_inv_type()</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_item_in_cash(self, item_id):
+    &#34;&#34;&#34;Checks whether the CASH tab of the inventory has an item
+
+    Uses Inventory::has_item_in_inv_type()
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    return self.has_item_in_inv_type(self.cash_inv, item_id)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.has_item_in_consume"><code class="name flex">
+<span>def <span class="ident">has_item_in_consume</span></span>(<span>self, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the USE tab of the inventory has an item</p>
+<p>Uses Inventory::has_item_in_inv_type()</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_item_in_consume(self, item_id):
+    &#34;&#34;&#34;Checks whether the USE tab of the inventory has an item
+
+    Uses Inventory::has_item_in_inv_type()
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    return self.has_item_in_inv_type(self.consume_inv, item_id)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.has_item_in_equip"><code class="name flex">
+<span>def <span class="ident">has_item_in_equip</span></span>(<span>self, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the EQUIP tab of the inventory has an item</p>
+<p>Uses Inventory::has_item_in_inv_type()</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_item_in_equip(self, item_id):
+    &#34;&#34;&#34;Checks whether the EQUIP tab of the inventory has an item
+
+    Uses Inventory::has_item_in_inv_type()
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    return self.has_item_in_inv_type(self.equip_inv, item_id)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.has_item_in_etc"><code class="name flex">
+<span>def <span class="ident">has_item_in_etc</span></span>(<span>self, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the ETC tab of the inventory has an item</p>
+<p>Uses Inventory::has_item_in_inv_type()</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_item_in_etc(self, item_id):
+    &#34;&#34;&#34;Checks whether the ETC tab of the inventory has an item
+
+    Uses Inventory::has_item_in_inv_type()
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    return self.has_item_in_inv_type(self.etc_inv, item_id)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.inventory.Inventory.has_item_in_install"><code class="name flex">
+<span>def <span class="ident">has_item_in_install</span></span>(<span>self, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the SETUP tab of the inventory has an item</p>
+<p>Uses Inventory::has_item_in_inv_type()</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_item_in_install(self, item_id):
+    &#34;&#34;&#34;Checks whether the SETUP tab of the inventory has an item
+
+    Uses Inventory::has_item_in_inv_type()
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    return self.has_item_in_inv_type(self.install_inv, item_id)</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.inventory.Inventory.init_cash_inv"><code class="name flex">
 <span>def <span class="ident">init_cash_inv</span></span>(<span>self)</span>
 </code></dt>
@@ -453,24 +870,63 @@ def inventory_ids(self):
     return self.load_inv(&#34;consume_inv_id&#34;)</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.inventory.Inventory.is_equipping"><code class="name flex">
+<span>def <span class="ident">is_equipping</span></span>(<span>self, item_id)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the EQUIP window (i.e. Hotkey "E") has an item (i.e. item is equipped)</p>
+<p>Uses Inventory::has_item_in_inv_type()</p>
+<h2 id="returns">Returns</h2>
+<p>Boolean, representing whether the specified item was found</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_equipping(self, item_id):
+    &#34;&#34;&#34;Checks whether the EQUIP window (i.e. Hotkey &#34;E&#34;) has an item (i.e. item is equipped)
+
+    Uses Inventory::has_item_in_inv_type()
+
+    Returns:
+        Boolean, representing whether the specified item was found
+    &#34;&#34;&#34;
+    return self.has_item_in_inv_type(self.equipped_inv, item_id)</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.inventory.Inventory.load_inv"><code class="name flex">
 <span>def <span class="ident">load_inv</span></span>(<span>self, inventory_type)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given an inventory_type, load every item in it.
-Refer to Character::init_inventory_ids() for a list of inventory_types.
-:param inventory_type: string
-:return: dictionary</p></div>
+<div class="desc"><p>Given an inventory_type, fetch every item associated with it.</p>
+<p>Generic instance method used by Character::init_XXX_inv() methods.
+Refer to Character::init_inventory_ids() for a list of inventory_types.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>inventory_type</code></strong></dt>
+<dd>string, representing the inventory type</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>dictionary, representing all the in-game items that in the specified inventory type</p>
+<h2 id="raises">Raises</h2>
+<p>Generic error</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_inv(self, inventory_type):
-    &#34;&#34;&#34;
-    Given an inventory_type, load every item in it.
+    &#34;&#34;&#34;Given an inventory_type, fetch every item associated with it.
+
+    Generic instance method used by Character::init_XXX_inv() methods.
     Refer to Character::init_inventory_ids() for a list of inventory_types.
-    :param inventory_type: string
-    :return: dictionary
+
+    Args:
+        inventory_type: string, representing the inventory type
+
+    Returns:
+        dictionary, representing all the in-game items that in the specified inventory type
+
+    Raises:
+        Generic error
     &#34;&#34;&#34;
     try:
         database = con.connect(
@@ -502,7 +958,7 @@ Refer to Character::init_inventory_ids() for a list of inventory_types.
             inv[bag_index] = item_stats
         return inv
     except Exception as e:
-        print(&#34;Critical: Error occured when initializing equip items&#34;, e)</code></pre>
+        print(&#34;CRITICAL: Error occurred when initializing inventory items: \n&#34;, e)</code></pre>
 </details>
 </dd>
 </dl>
@@ -525,13 +981,19 @@ Refer to Character::init_inventory_ids() for a list of inventory_types.
 <ul>
 <li>
 <h4><code><a title="swordie_db.inventory.Inventory" href="#swordie_db.inventory.Inventory">Inventory</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="swordie_db.inventory.Inventory.cash_inv" href="#swordie_db.inventory.Inventory.cash_inv">cash_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.consume_inv" href="#swordie_db.inventory.Inventory.consume_inv">consume_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.database_config" href="#swordie_db.inventory.Inventory.database_config">database_config</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.equip_inv" href="#swordie_db.inventory.Inventory.equip_inv">equip_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.equipped_inv" href="#swordie_db.inventory.Inventory.equipped_inv">equipped_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.etc_inv" href="#swordie_db.inventory.Inventory.etc_inv">etc_inv</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.has_item_in_cash" href="#swordie_db.inventory.Inventory.has_item_in_cash">has_item_in_cash</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.has_item_in_consume" href="#swordie_db.inventory.Inventory.has_item_in_consume">has_item_in_consume</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.has_item_in_equip" href="#swordie_db.inventory.Inventory.has_item_in_equip">has_item_in_equip</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.has_item_in_etc" href="#swordie_db.inventory.Inventory.has_item_in_etc">has_item_in_etc</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.has_item_in_install" href="#swordie_db.inventory.Inventory.has_item_in_install">has_item_in_install</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.has_item_in_inv_type" href="#swordie_db.inventory.Inventory.has_item_in_inv_type">has_item_in_inv_type</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.init_cash_inv" href="#swordie_db.inventory.Inventory.init_cash_inv">init_cash_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.init_equip_items" href="#swordie_db.inventory.Inventory.init_equip_items">init_equip_items</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.init_equipped_inv" href="#swordie_db.inventory.Inventory.init_equipped_inv">init_equipped_inv</a></code></li>
@@ -540,6 +1002,7 @@ Refer to Character::init_inventory_ids() for a list of inventory_types.
 <li><code><a title="swordie_db.inventory.Inventory.init_use_inv" href="#swordie_db.inventory.Inventory.init_use_inv">init_use_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.install_inv" href="#swordie_db.inventory.Inventory.install_inv">install_inv</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.inventory_ids" href="#swordie_db.inventory.Inventory.inventory_ids">inventory_ids</a></code></li>
+<li><code><a title="swordie_db.inventory.Inventory.is_equipping" href="#swordie_db.inventory.Inventory.is_equipping">is_equipping</a></code></li>
 <li><code><a title="swordie_db.inventory.Inventory.load_inv" href="#swordie_db.inventory.Inventory.load_inv">load_inv</a></code></li>
 </ul>
 </li>

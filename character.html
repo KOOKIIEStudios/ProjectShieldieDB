@@ -183,7 +183,7 @@ class Character:
         a new User object instance, with the relevant user attributes from the database.
 
         Returns:
-            User
+            User object with attributes identical to its corresponding entry in the database
         Raises:
             Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
@@ -613,27 +613,52 @@ class Character:
     def inventory(self):
         return self._inventory
 
-    def get_user_id(self):
-        &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+    def get_char_img(self):
+        equipped_items = [self.face, self.hair]
+        equipped_inv = self.inventory.equipped_inv
 
-        Created this method to avoid circular imports by using SwordieDB&#39;s get_user_id
+        for item in equipped_inv:
+            item_id = equipped_inv[item][&#34;itemid&#34;]
+            equipped_items.append(item_id)
+
+        url = f&#34;https://maplestory.io/api/GMS/216/Character/200{self.skin}/{str(equipped_items)[1:-1]}/stand1/1&#34;.replace(&#34; &#34;, &#34;&#34;)
+
+        return url
+
+    @staticmethod
+    def get_user_id_by_name(config, char_name):
+        &#34;&#34;&#34;Given a character name, retrieve its corresponding user id from database
+
+        Used by Character::get_user_id() &amp; SwordieDB::get_user_id_by_name()
+        There is no direct way of obtaining this information.
+        Hence, this method will fetch the character ID from the database, using the character name.
+        Then, fetch the account ID from the database, using the character ID.
+        Then, fetch the user ID from the database, using the account ID.
+
+        Args:
+            config: dictionary, representing database config attributes
+            char_name: string, representing the character name in the database
 
         Returns:
-            Int, representing the User ID
-            Returns None if User ID is not found
+            String, representing the user ID in the database
+            Defaults to None if the operation fails.
+
         Raises:
-            Generic error on failure
+            SQL Error 2003: Can&#39;t cannect to DB
+            WinError 10060: No response from DB
+            List index out of range: Wrong character name
         &#34;&#34;&#34;
-        host = self._database_config[&#34;host&#34;]
-        user = self._database_config[&#34;user&#34;]
-        password = self._database_config[&#34;password&#34;]
-        schema = self._database_config[&#34;schema&#34;]
-        port = self._database_config[&#34;port&#34;]
         try:
-            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+            database = con.connect(
+                host=config[&#34;host&#34;],
+                user=config[&#34;user&#34;],
+                password=config[&#34;password&#34;],
+                database=config[&#34;schema&#34;],
+                port=config[&#34;port&#34;]
+            )
             cursor = database.cursor(dictionary=True)
 
-            cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{self.name}&#39;&#34;)
+            cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
             char_id = cursor.fetchall()[0][&#34;characterid&#34;]
 
             cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
@@ -648,6 +673,22 @@ class Character:
         except Exception as e:
             print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
             return None  # Return None if there was an error
+
+    def get_user_id(self):
+        &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+
+        Uses static method Character::get_user_id_by_name() for core logic
+
+        Returns:
+            Int, representing the User ID
+            Returns None if User ID is not found
+        Raises:
+            Errors are handled and thrown by Character::get_user_id_by_name()
+            SQL Error 2003: Can&#39;t cannect to DB
+            WinError 10060: No response from DB
+            List index out of range: Wrong character name
+        &#34;&#34;&#34;
+        return self.get_user_id_by_name(self._database_config, self._name)
 
     def set_stat_by_column(self, column, value):
         &#34;&#34;&#34;Update a character&#39;s stats from column name in database
@@ -934,7 +975,7 @@ This class contains the appropriate getter and setter methods for said attribute
         a new User object instance, with the relevant user attributes from the database.
 
         Returns:
-            User
+            User object with attributes identical to its corresponding entry in the database
         Raises:
             Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
@@ -1364,27 +1405,52 @@ This class contains the appropriate getter and setter methods for said attribute
     def inventory(self):
         return self._inventory
 
-    def get_user_id(self):
-        &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+    def get_char_img(self):
+        equipped_items = [self.face, self.hair]
+        equipped_inv = self.inventory.equipped_inv
 
-        Created this method to avoid circular imports by using SwordieDB&#39;s get_user_id
+        for item in equipped_inv:
+            item_id = equipped_inv[item][&#34;itemid&#34;]
+            equipped_items.append(item_id)
+
+        url = f&#34;https://maplestory.io/api/GMS/216/Character/200{self.skin}/{str(equipped_items)[1:-1]}/stand1/1&#34;.replace(&#34; &#34;, &#34;&#34;)
+
+        return url
+
+    @staticmethod
+    def get_user_id_by_name(config, char_name):
+        &#34;&#34;&#34;Given a character name, retrieve its corresponding user id from database
+
+        Used by Character::get_user_id() &amp; SwordieDB::get_user_id_by_name()
+        There is no direct way of obtaining this information.
+        Hence, this method will fetch the character ID from the database, using the character name.
+        Then, fetch the account ID from the database, using the character ID.
+        Then, fetch the user ID from the database, using the account ID.
+
+        Args:
+            config: dictionary, representing database config attributes
+            char_name: string, representing the character name in the database
 
         Returns:
-            Int, representing the User ID
-            Returns None if User ID is not found
+            String, representing the user ID in the database
+            Defaults to None if the operation fails.
+
         Raises:
-            Generic error on failure
+            SQL Error 2003: Can&#39;t cannect to DB
+            WinError 10060: No response from DB
+            List index out of range: Wrong character name
         &#34;&#34;&#34;
-        host = self._database_config[&#34;host&#34;]
-        user = self._database_config[&#34;user&#34;]
-        password = self._database_config[&#34;password&#34;]
-        schema = self._database_config[&#34;schema&#34;]
-        port = self._database_config[&#34;port&#34;]
         try:
-            database = con.connect(host=host, user=user, password=password, database=schema, port=port)
+            database = con.connect(
+                host=config[&#34;host&#34;],
+                user=config[&#34;user&#34;],
+                password=config[&#34;password&#34;],
+                database=config[&#34;schema&#34;],
+                port=config[&#34;port&#34;]
+            )
             cursor = database.cursor(dictionary=True)
 
-            cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{self.name}&#39;&#34;)
+            cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
             char_id = cursor.fetchall()[0][&#34;characterid&#34;]
 
             cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
@@ -1399,6 +1465,22 @@ This class contains the appropriate getter and setter methods for said attribute
         except Exception as e:
             print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
             return None  # Return None if there was an error
+
+    def get_user_id(self):
+        &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
+
+        Uses static method Character::get_user_id_by_name() for core logic
+
+        Returns:
+            Int, representing the User ID
+            Returns None if User ID is not found
+        Raises:
+            Errors are handled and thrown by Character::get_user_id_by_name()
+            SQL Error 2003: Can&#39;t cannect to DB
+            WinError 10060: No response from DB
+            List index out of range: Wrong character name
+        &#34;&#34;&#34;
+        return self.get_user_id_by_name(self._database_config, self._name)
 
     def set_stat_by_column(self, column, value):
         &#34;&#34;&#34;Update a character&#39;s stats from column name in database
@@ -1509,6 +1591,89 @@ def get_db(config, query):
         
     except Exception as e:
         print(&#34;CRITICAL: Error encountered whilst attempting to connect to the database! \n&#34;, e)</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.character.Character.get_user_id_by_name"><code class="name flex">
+<span>def <span class="ident">get_user_id_by_name</span></span>(<span>config, char_name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a character name, retrieve its corresponding user id from database</p>
+<p>Used by Character::get_user_id() &amp; SwordieDB::get_user_id_by_name()
+There is no direct way of obtaining this information.
+Hence, this method will fetch the character ID from the database, using the character name.
+Then, fetch the account ID from the database, using the character ID.
+Then, fetch the user ID from the database, using the account ID.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config</code></strong></dt>
+<dd>dictionary, representing database config attributes</dd>
+<dt><strong><code>char_name</code></strong></dt>
+<dd>string, representing the character name in the database</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>String, representing the user ID in the database
+Defaults to None if the operation fails.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>SQL Error 2003</code></dt>
+<dd>Can't cannect to DB</dd>
+<dt><code>WinError 10060</code></dt>
+<dd>No response from DB</dd>
+<dt><code>List index out</code> of <code>range</code></dt>
+<dd>Wrong character name</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def get_user_id_by_name(config, char_name):
+    &#34;&#34;&#34;Given a character name, retrieve its corresponding user id from database
+
+    Used by Character::get_user_id() &amp; SwordieDB::get_user_id_by_name()
+    There is no direct way of obtaining this information.
+    Hence, this method will fetch the character ID from the database, using the character name.
+    Then, fetch the account ID from the database, using the character ID.
+    Then, fetch the user ID from the database, using the account ID.
+
+    Args:
+        config: dictionary, representing database config attributes
+        char_name: string, representing the character name in the database
+
+    Returns:
+        String, representing the user ID in the database
+        Defaults to None if the operation fails.
+
+    Raises:
+        SQL Error 2003: Can&#39;t cannect to DB
+        WinError 10060: No response from DB
+        List index out of range: Wrong character name
+    &#34;&#34;&#34;
+    try:
+        database = con.connect(
+            host=config[&#34;host&#34;],
+            user=config[&#34;user&#34;],
+            password=config[&#34;password&#34;],
+            database=config[&#34;schema&#34;],
+            port=config[&#34;port&#34;]
+        )
+        cursor = database.cursor(dictionary=True)
+
+        cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
+        char_id = cursor.fetchall()[0][&#34;characterid&#34;]
+
+        cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
+        account_id = cursor.fetchall()[0][&#34;accid&#34;]
+
+        cursor.execute(f&#34;SELECT userid FROM accounts WHERE id = &#39;{account_id}&#39;&#34;)
+        user_id = cursor.fetchall()[0][&#34;userid&#34;]
+
+        database.disconnect()
+        return user_id
+
+    except Exception as e:
+        print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
+        return None  # Return None if there was an error</code></pre>
 </details>
 </dd>
 </dl>
@@ -2153,6 +2318,28 @@ def user(self):
     self.strength = new_str</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.character.Character.get_char_img"><code class="name flex">
+<span>def <span class="ident">get_char_img</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_char_img(self):
+    equipped_items = [self.face, self.hair]
+    equipped_inv = self.inventory.equipped_inv
+
+    for item in equipped_inv:
+        item_id = equipped_inv[item][&#34;itemid&#34;]
+        equipped_items.append(item_id)
+
+    url = f&#34;https://maplestory.io/api/GMS/216/Character/200{self.skin}/{str(equipped_items)[1:-1]}/stand1/1&#34;.replace(&#34; &#34;, &#34;&#34;)
+
+    return url</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.character.Character.get_inventory_ids"><code class="name flex">
 <span>def <span class="ident">get_inventory_ids</span></span>(<span>self)</span>
 </code></dt>
@@ -2270,12 +2457,20 @@ def user(self):
 </code></dt>
 <dd>
 <div class="desc"><p>Queries the database to obtain the User ID associated with this character instance</p>
-<p>Created this method to avoid circular imports by using SwordieDB's get_user_id</p>
+<p>Uses static method Character::get_user_id_by_name() for core logic</p>
 <h2 id="returns">Returns</h2>
 <p>Int, representing the User ID
 Returns None if User ID is not found</p>
 <h2 id="raises">Raises</h2>
-<p>Generic error on failure</p></div>
+<dl>
+<dt>Errors are handled and thrown by Character::get_user_id_by_name()</dt>
+<dt><code>SQL Error 2003</code></dt>
+<dd>Can't cannect to DB</dd>
+<dt><code>WinError 10060</code></dt>
+<dd>No response from DB</dd>
+<dt><code>List index out</code> of <code>range</code></dt>
+<dd>Wrong character name</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2283,38 +2478,18 @@ Returns None if User ID is not found</p>
 <pre><code class="python">def get_user_id(self):
     &#34;&#34;&#34;Queries the database to obtain the User ID associated with this character instance
 
-    Created this method to avoid circular imports by using SwordieDB&#39;s get_user_id
+    Uses static method Character::get_user_id_by_name() for core logic
 
     Returns:
         Int, representing the User ID
         Returns None if User ID is not found
     Raises:
-        Generic error on failure
+        Errors are handled and thrown by Character::get_user_id_by_name()
+        SQL Error 2003: Can&#39;t cannect to DB
+        WinError 10060: No response from DB
+        List index out of range: Wrong character name
     &#34;&#34;&#34;
-    host = self._database_config[&#34;host&#34;]
-    user = self._database_config[&#34;user&#34;]
-    password = self._database_config[&#34;password&#34;]
-    schema = self._database_config[&#34;schema&#34;]
-    port = self._database_config[&#34;port&#34;]
-    try:
-        database = con.connect(host=host, user=user, password=password, database=schema, port=port)
-        cursor = database.cursor(dictionary=True)
-
-        cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{self.name}&#39;&#34;)
-        char_id = cursor.fetchall()[0][&#34;characterid&#34;]
-
-        cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
-        account_id = cursor.fetchall()[0][&#34;accid&#34;]
-
-        cursor.execute(f&#34;SELECT userid FROM accounts WHERE id = &#39;{account_id}&#39;&#34;)
-        user_id = cursor.fetchall()[0][&#34;userid&#34;]
-
-        database.disconnect()
-        return user_id
-
-    except Exception as e:
-        print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
-        return None  # Return None if there was an error</code></pre>
+    return self.get_user_id_by_name(self._database_config, self._name)</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.character.Character.init_inv_id"><code class="name flex">
@@ -2419,7 +2594,7 @@ the Character object instance.</p></div>
 Checks the User ID associated with the character instance, and uses the User class constructor to create
 a new User object instance, with the relevant user attributes from the database.</p>
 <h2 id="returns">Returns</h2>
-<p>User</p>
+<p>User object with attributes identical to its corresponding entry in the database</p>
 <h2 id="raises">Raises</h2>
 <p>Generic error on failure - handled by the Character::get_db() method</p></div>
 <details class="source">
@@ -2434,7 +2609,7 @@ a new User object instance, with the relevant user attributes from the database.
     a new User object instance, with the relevant user attributes from the database.
 
     Returns:
-        User
+        User object with attributes identical to its corresponding entry in the database
     Raises:
         Generic error on failure - handled by the Character::get_db() method
     &#34;&#34;&#34;
@@ -2567,12 +2742,14 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.exp" href="#swordie_db.character.Character.exp">exp</a></code></li>
 <li><code><a title="swordie_db.character.Character.face" href="#swordie_db.character.Character.face">face</a></code></li>
 <li><code><a title="swordie_db.character.Character.fame" href="#swordie_db.character.Character.fame">fame</a></code></li>
+<li><code><a title="swordie_db.character.Character.get_char_img" href="#swordie_db.character.Character.get_char_img">get_char_img</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_db" href="#swordie_db.character.Character.get_db">get_db</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_inventory_ids" href="#swordie_db.character.Character.get_inventory_ids">get_inventory_ids</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_job_name" href="#swordie_db.character.Character.get_job_name">get_job_name</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_primary_stats" href="#swordie_db.character.Character.get_primary_stats">get_primary_stats</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_stat_by_column" href="#swordie_db.character.Character.get_stat_by_column">get_stat_by_column</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_user_id" href="#swordie_db.character.Character.get_user_id">get_user_id</a></code></li>
+<li><code><a title="swordie_db.character.Character.get_user_id_by_name" href="#swordie_db.character.Character.get_user_id_by_name">get_user_id_by_name</a></code></li>
 <li><code><a title="swordie_db.character.Character.hair" href="#swordie_db.character.Character.hair">hair</a></code></li>
 <li><code><a title="swordie_db.character.Character.init_inv_id" href="#swordie_db.character.Character.init_inv_id">init_inv_id</a></code></li>
 <li><code><a title="swordie_db.character.Character.init_stats" href="#swordie_db.character.Character.init_stats">init_stats</a></code></li>

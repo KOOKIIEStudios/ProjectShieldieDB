@@ -81,6 +81,14 @@ class SwordieDB:
         self._password = password
         self._port = port
 
+        self._database_config = {
+            &#34;host&#34;: self.host,
+            &#34;user&#34;: self.user,
+            &#34;password&#34;: self.password,
+            &#34;schema&#34;: self.schema,
+            &#34;port&#34;: self.port
+        }
+
     @property
     def host(self):
         return self._host
@@ -135,54 +143,39 @@ class SwordieDB:
             Defaults to None if the operation fails.
 
         Raises:
-            SQL Error 2003: Can&#39;t cannect to DB
-            WinError 10060: No response from DB
-            List index out of range: Wrong character name
+            Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
-        try:
-            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-            cursor = database.cursor(dictionary=True)
-            cursor.execute(f&#34;SELECT * FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
-            character_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
-            database.disconnect()
-            database_config = {
-                &#34;host&#34;: self.host,
-                &#34;user&#34;: self.user,
-                &#34;password&#34;: self.password,
-                &#34;schema&#34;: self.schema,
-                &#34;port&#34;: self.port
-            }
-            character = Character(character_stats, database_config)
-            return character
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to retrieve character from database.&#34;, e)
-            return None
+        character_stats = Character.get_db(
+            self._database_config,
+            f&#34;SELECT * FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;
+        )  # Fetch first result because there should only be one character with that name
+
+        character = Character(character_stats, self._database_config)
+        return character
 
     def get_user_by_username(self, username):
+        &#34;&#34;&#34;Given a username (NOT IGN), create a new user object instance
+
+        Fetches the user attributes from the database by querying for username.
+        uses the User class constructor to create a new User object instance, with the said attributes.
+        Useful for getting account information from accounts with no characters.
+
+        Args:
+            username: String, representing the username used for logging the user into game
+
+        Returns:
+            User object with attributes identical to its corresponding entry in the database
+
+        Raises:
+            Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
-        Given a username (NOT IGN), create a user object.
-        Useful for getting account information from accounts with no characters at all
-        :param username: string
-        :return: User
-        &#34;&#34;&#34;
-        try:
-            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-            cursor = database.cursor(dictionary=True)
-            cursor.execute(f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;)
-            user_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
-            database_config = {
-                &#34;host&#34;: self.host,
-                &#34;user&#34;: self.user,
-                &#34;password&#34;: self.password,
-                &#34;schema&#34;: self.schema,
-                &#34;port&#34;: self.port
-            }
-            database.disconnect()
-            user = User(user_stats, database_config)
-            return user
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to obtain a user object&#34;, e)
-            return None
+        user_stats = Character.get_db(
+            self._database_config,
+            f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;
+        )  # Fetch first result because there should only be one character with that name
+
+        user = User(user_stats, self._database_config)
+        return user
 
     def set_char_stat(self, name, column, value):
         &#34;&#34;&#34;Given a character name and column name, change its value in the database
@@ -215,10 +208,7 @@ class SwordieDB:
     def get_user_id_by_name(self, char_name):
         &#34;&#34;&#34;Given a character name, retrieve its corresponding user id from database
 
-        There is no direct way of obtaining this information.
-        Hence, this method will fetch the character ID from the database, using the character name.
-        Then, fetch the account ID from the database, using the character ID.
-        Then, fetch the user ID from the database, using the account ID.
+        Uses static method Character::get_user_id_by_name() for core logic
 
         Args:
             char_name: string, representing the character name in the database
@@ -228,29 +218,12 @@ class SwordieDB:
             Defaults to None if the operation fails.
 
         Raises:
+            Errors are handled and thrown by Character::get_user_id_by_name()
             SQL Error 2003: Can&#39;t cannect to DB
             WinError 10060: No response from DB
             List index out of range: Wrong character name
         &#34;&#34;&#34;
-        try:
-            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-            cursor = database.cursor(dictionary=True)
-
-            cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
-            char_id = cursor.fetchall()[0][&#34;characterid&#34;]
-
-            cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
-            account_id = cursor.fetchall()[0][&#34;accid&#34;]
-
-            cursor.execute(f&#34;SELECT userid FROM accounts WHERE id = &#39;{account_id}&#39;&#34;)
-            user_id = cursor.fetchall()[0][&#34;userid&#34;]
-
-            database.disconnect()
-            return user_id
-
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
-            return None  # Return None if there was an error</code></pre>
+        return Character.get_user_id_by_name(self._database_config, char_name)</code></pre>
 </details>
 </section>
 <section>
@@ -311,6 +284,14 @@ that has attributes identical to the character with IGN "name" in the connected 
         self._password = password
         self._port = port
 
+        self._database_config = {
+            &#34;host&#34;: self.host,
+            &#34;user&#34;: self.user,
+            &#34;password&#34;: self.password,
+            &#34;schema&#34;: self.schema,
+            &#34;port&#34;: self.port
+        }
+
     @property
     def host(self):
         return self._host
@@ -365,54 +346,39 @@ that has attributes identical to the character with IGN "name" in the connected 
             Defaults to None if the operation fails.
 
         Raises:
-            SQL Error 2003: Can&#39;t cannect to DB
-            WinError 10060: No response from DB
-            List index out of range: Wrong character name
+            Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
-        try:
-            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-            cursor = database.cursor(dictionary=True)
-            cursor.execute(f&#34;SELECT * FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
-            character_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
-            database.disconnect()
-            database_config = {
-                &#34;host&#34;: self.host,
-                &#34;user&#34;: self.user,
-                &#34;password&#34;: self.password,
-                &#34;schema&#34;: self.schema,
-                &#34;port&#34;: self.port
-            }
-            character = Character(character_stats, database_config)
-            return character
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to retrieve character from database.&#34;, e)
-            return None
+        character_stats = Character.get_db(
+            self._database_config,
+            f&#34;SELECT * FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;
+        )  # Fetch first result because there should only be one character with that name
+
+        character = Character(character_stats, self._database_config)
+        return character
 
     def get_user_by_username(self, username):
+        &#34;&#34;&#34;Given a username (NOT IGN), create a new user object instance
+
+        Fetches the user attributes from the database by querying for username.
+        uses the User class constructor to create a new User object instance, with the said attributes.
+        Useful for getting account information from accounts with no characters.
+
+        Args:
+            username: String, representing the username used for logging the user into game
+
+        Returns:
+            User object with attributes identical to its corresponding entry in the database
+
+        Raises:
+            Generic error on failure - handled by the Character::get_db() method
         &#34;&#34;&#34;
-        Given a username (NOT IGN), create a user object.
-        Useful for getting account information from accounts with no characters at all
-        :param username: string
-        :return: User
-        &#34;&#34;&#34;
-        try:
-            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-            cursor = database.cursor(dictionary=True)
-            cursor.execute(f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;)
-            user_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
-            database_config = {
-                &#34;host&#34;: self.host,
-                &#34;user&#34;: self.user,
-                &#34;password&#34;: self.password,
-                &#34;schema&#34;: self.schema,
-                &#34;port&#34;: self.port
-            }
-            database.disconnect()
-            user = User(user_stats, database_config)
-            return user
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to obtain a user object&#34;, e)
-            return None
+        user_stats = Character.get_db(
+            self._database_config,
+            f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;
+        )  # Fetch first result because there should only be one character with that name
+
+        user = User(user_stats, self._database_config)
+        return user
 
     def set_char_stat(self, name, column, value):
         &#34;&#34;&#34;Given a character name and column name, change its value in the database
@@ -445,10 +411,7 @@ that has attributes identical to the character with IGN "name" in the connected 
     def get_user_id_by_name(self, char_name):
         &#34;&#34;&#34;Given a character name, retrieve its corresponding user id from database
 
-        There is no direct way of obtaining this information.
-        Hence, this method will fetch the character ID from the database, using the character name.
-        Then, fetch the account ID from the database, using the character ID.
-        Then, fetch the user ID from the database, using the account ID.
+        Uses static method Character::get_user_id_by_name() for core logic
 
         Args:
             char_name: string, representing the character name in the database
@@ -458,29 +421,12 @@ that has attributes identical to the character with IGN "name" in the connected 
             Defaults to None if the operation fails.
 
         Raises:
+            Errors are handled and thrown by Character::get_user_id_by_name()
             SQL Error 2003: Can&#39;t cannect to DB
             WinError 10060: No response from DB
             List index out of range: Wrong character name
         &#34;&#34;&#34;
-        try:
-            database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-            cursor = database.cursor(dictionary=True)
-
-            cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
-            char_id = cursor.fetchall()[0][&#34;characterid&#34;]
-
-            cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
-            account_id = cursor.fetchall()[0][&#34;accid&#34;]
-
-            cursor.execute(f&#34;SELECT userid FROM accounts WHERE id = &#39;{account_id}&#39;&#34;)
-            user_id = cursor.fetchall()[0][&#34;userid&#34;]
-
-            database.disconnect()
-            return user_id
-
-        except Exception as e:
-            print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
-            return None  # Return None if there was an error</code></pre>
+        return Character.get_user_id_by_name(self._database_config, char_name)</code></pre>
 </details>
 <h3>Instance variables</h3>
 <dl>
@@ -563,14 +509,7 @@ character data and database attributes from the connected database.</p>
 <p>Character object instantiated with corresponding data from the connected database.
 Defaults to None if the operation fails.</p>
 <h2 id="raises">Raises</h2>
-<dl>
-<dt><code>SQL Error 2003</code></dt>
-<dd>Can't cannect to DB</dd>
-<dt><code>WinError 10060</code></dt>
-<dd>No response from DB</dd>
-<dt><code>List index out</code> of <code>range</code></dt>
-<dd>Wrong character name</dd>
-</dl></div>
+<p>Generic error on failure - handled by the Character::get_db() method</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -589,67 +528,61 @@ Defaults to None if the operation fails.</p>
         Defaults to None if the operation fails.
 
     Raises:
-        SQL Error 2003: Can&#39;t cannect to DB
-        WinError 10060: No response from DB
-        List index out of range: Wrong character name
+        Generic error on failure - handled by the Character::get_db() method
     &#34;&#34;&#34;
-    try:
-        database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-        cursor = database.cursor(dictionary=True)
-        cursor.execute(f&#34;SELECT * FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
-        character_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
-        database.disconnect()
-        database_config = {
-            &#34;host&#34;: self.host,
-            &#34;user&#34;: self.user,
-            &#34;password&#34;: self.password,
-            &#34;schema&#34;: self.schema,
-            &#34;port&#34;: self.port
-        }
-        character = Character(character_stats, database_config)
-        return character
-    except Exception as e:
-        print(&#34;[ERROR] Error trying to retrieve character from database.&#34;, e)
-        return None</code></pre>
+    character_stats = Character.get_db(
+        self._database_config,
+        f&#34;SELECT * FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;
+    )  # Fetch first result because there should only be one character with that name
+
+    character = Character(character_stats, self._database_config)
+    return character</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.database.SwordieDB.get_user_by_username"><code class="name flex">
 <span>def <span class="ident">get_user_by_username</span></span>(<span>self, username)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given a username (NOT IGN), create a user object.
-Useful for getting account information from accounts with no characters at all
-:param username: string
-:return: User</p></div>
+<div class="desc"><p>Given a username (NOT IGN), create a new user object instance</p>
+<p>Fetches the user attributes from the database by querying for username.
+uses the User class constructor to create a new User object instance, with the said attributes.
+Useful for getting account information from accounts with no characters.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>username</code></strong></dt>
+<dd>String, representing the username used for logging the user into game</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>User object with attributes identical to its corresponding entry in the database</p>
+<h2 id="raises">Raises</h2>
+<p>Generic error on failure - handled by the Character::get_db() method</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_user_by_username(self, username):
+    &#34;&#34;&#34;Given a username (NOT IGN), create a new user object instance
+
+    Fetches the user attributes from the database by querying for username.
+    uses the User class constructor to create a new User object instance, with the said attributes.
+    Useful for getting account information from accounts with no characters.
+
+    Args:
+        username: String, representing the username used for logging the user into game
+
+    Returns:
+        User object with attributes identical to its corresponding entry in the database
+
+    Raises:
+        Generic error on failure - handled by the Character::get_db() method
     &#34;&#34;&#34;
-    Given a username (NOT IGN), create a user object.
-    Useful for getting account information from accounts with no characters at all
-    :param username: string
-    :return: User
-    &#34;&#34;&#34;
-    try:
-        database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-        cursor = database.cursor(dictionary=True)
-        cursor.execute(f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;)
-        user_stats = cursor.fetchall()[0]  # It is 0 because there should only be one character with that name
-        database_config = {
-            &#34;host&#34;: self.host,
-            &#34;user&#34;: self.user,
-            &#34;password&#34;: self.password,
-            &#34;schema&#34;: self.schema,
-            &#34;port&#34;: self.port
-        }
-        database.disconnect()
-        user = User(user_stats, database_config)
-        return user
-    except Exception as e:
-        print(&#34;[ERROR] Error trying to obtain a user object&#34;, e)
-        return None</code></pre>
+    user_stats = Character.get_db(
+        self._database_config,
+        f&#34;SELECT * FROM users WHERE name = &#39;{username}&#39;&#34;
+    )  # Fetch first result because there should only be one character with that name
+
+    user = User(user_stats, self._database_config)
+    return user</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.database.SwordieDB.get_user_id_by_name"><code class="name flex">
@@ -657,10 +590,7 @@ Useful for getting account information from accounts with no characters at all
 </code></dt>
 <dd>
 <div class="desc"><p>Given a character name, retrieve its corresponding user id from database</p>
-<p>There is no direct way of obtaining this information.
-Hence, this method will fetch the character ID from the database, using the character name.
-Then, fetch the account ID from the database, using the character ID.
-Then, fetch the user ID from the database, using the account ID.</p>
+<p>Uses static method Character::get_user_id_by_name() for core logic</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>char_name</code></strong></dt>
@@ -671,6 +601,7 @@ Then, fetch the user ID from the database, using the account ID.</p>
 Defaults to None if the operation fails.</p>
 <h2 id="raises">Raises</h2>
 <dl>
+<dt>Errors are handled and thrown by Character::get_user_id_by_name()</dt>
 <dt><code>SQL Error 2003</code></dt>
 <dd>Can't cannect to DB</dd>
 <dt><code>WinError 10060</code></dt>
@@ -685,10 +616,7 @@ Defaults to None if the operation fails.</p>
 <pre><code class="python">def get_user_id_by_name(self, char_name):
     &#34;&#34;&#34;Given a character name, retrieve its corresponding user id from database
 
-    There is no direct way of obtaining this information.
-    Hence, this method will fetch the character ID from the database, using the character name.
-    Then, fetch the account ID from the database, using the character ID.
-    Then, fetch the user ID from the database, using the account ID.
+    Uses static method Character::get_user_id_by_name() for core logic
 
     Args:
         char_name: string, representing the character name in the database
@@ -698,29 +626,12 @@ Defaults to None if the operation fails.</p>
         Defaults to None if the operation fails.
 
     Raises:
+        Errors are handled and thrown by Character::get_user_id_by_name()
         SQL Error 2003: Can&#39;t cannect to DB
         WinError 10060: No response from DB
         List index out of range: Wrong character name
     &#34;&#34;&#34;
-    try:
-        database = con.connect(host=self.host, user=self.user, password=self.password, database=self.schema, port=self.port)
-        cursor = database.cursor(dictionary=True)
-
-        cursor.execute(f&#34;SELECT characterid FROM characterstats WHERE name = &#39;{char_name}&#39;&#34;)
-        char_id = cursor.fetchall()[0][&#34;characterid&#34;]
-
-        cursor.execute(f&#34;SELECT accid FROM characters WHERE id = &#39;{char_id}&#39;&#34;)
-        account_id = cursor.fetchall()[0][&#34;accid&#34;]
-
-        cursor.execute(f&#34;SELECT userid FROM accounts WHERE id = &#39;{account_id}&#39;&#34;)
-        user_id = cursor.fetchall()[0][&#34;userid&#34;]
-
-        database.disconnect()
-        return user_id
-
-    except Exception as e:
-        print(&#34;[ERROR] Error trying to get user id from database.&#34;, e)
-        return None  # Return None if there was an error</code></pre>
+    return Character.get_user_id_by_name(self._database_config, char_name)</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.database.SwordieDB.set_char_stat"><code class="name flex">
