@@ -26,4 +26,5 @@ Automated unit tests for Character handling checks completed:
 Automated unit tests for User handling checks completed:  
 ![](https://i.imgur.com/w4oEhPv.png)
 
-Automated unit tests for Inventory handling checks pending...  
+Automated unit tests for Inventory handling completed:  
+![](https://i.imgur.com/a82eDPc.png)

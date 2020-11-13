@@ -1,4 +1,4 @@
-"""This is a unit test for checking basic Character handling functionality
+"""This is a unit test for checking basic User handling functionality
 
 NOTE: This script needs to be in the same directory as the swordie_db module.
 This can be run directly for a quick test of functionality (alter DB attributes prior to use).

@@ -42,3 +42,78 @@ charismaexp=0, insightexp=0, willexp=0, craftexp=0, senseexp=0, charmexp=0,
 noncombatstatdaylimit=900001, pvpexp=0, pvpgrade=0, pvppoint=0, pvpmodelevel=0, pvpmodetype=0, 
 eventpoint=0, albaactivityid=0, albastarttime='1601-01-01 11:13:45.000', albaduration=0, albaspecialreward=0, burning=0, 
 charactercard=900001, accountlastlogout=900001, lastlogout='1601-01-01 11:13:45.000', gachexp=0, honorexp=0, nextavailablefametime='1601-01-01 11:13:45.000';
+
+-- Handle all 6 inventory types for Char 900,001
+-- Equipped
+INSERT INTO inventories (id, type, slots)
+VALUES (5400001, 0, 52)
+ON DUPLICATE KEY UPDATE type=0, slots=52;
+-- EQUIP
+INSERT INTO inventories (id, type, slots)
+VALUES (5400002, 1, 52)
+ON DUPLICATE KEY UPDATE type=1, slots=52;
+-- USE
+INSERT INTO inventories (id, type, slots)
+VALUES (5400003, 2, 52)
+ON DUPLICATE KEY UPDATE type=0, slots=52;
+-- ETC
+INSERT INTO inventories (id, type, slots)
+VALUES (5400004, 3, 52)
+ON DUPLICATE KEY UPDATE type=0, slots=52;
+-- SETUP
+INSERT INTO inventories (id, type, slots)
+VALUES (5400005, 4, 52)
+ON DUPLICATE KEY UPDATE type=0, slots=52;
+-- CASH
+INSERT INTO inventories (id, type, slots)
+VALUES (5400006, 5, 52)
+ON DUPLICATE KEY UPDATE type=0, slots=52;
+
+-- Create equipped, cash equipped, equip, cash equip, use, cash use, etc, setup, cash
+-- bagindex:  1-Cap; 5-Overalls; 7-Boots; 8-Gloves; 9-Cape; 10-Shield; 11-Weapon
+--            49-Medal; 55-Crusader Codex; 
+-- Equipped
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000001, 5400001, 1002140, 1, '9999-01-01 00:00:01.000', 0, 0, 0, 1)
+ON DUPLICATE KEY UPDATE inventoryid=5400001, itemid=1002140, bagindex=1, 
+dateexpire='9999-01-01 00:00:01.000', invtype=0, `type`=0, iscash=0, quantity=1;
+-- Cash Equipped
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000002, 5400001, 1702121, 11, '9999-01-01 00:00:01.000', 0, 0, 1, 1)
+ON DUPLICATE KEY UPDATE inventoryid=5400001, itemid=1702121, bagindex=11, 
+dateexpire='9999-01-01 00:00:01.000', invtype=0, `type`=0, iscash=1, quantity=1;
+-- EQUIP
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000003, 5400002, 1002140, 10, '9999-01-01 00:00:01.000', 1, 0, 0, 1)
+ON DUPLICATE KEY UPDATE inventoryid=5400002, itemid=1002140, bagindex=10, 
+dateexpire='9999-01-01 00:00:01.000', invtype=1, `type`=0, iscash=0, quantity=1;
+-- Cash EQUIP
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000004, 5400002, 1702121, 11, '9999-01-01 00:00:01.000', 1, 0, 1, 1)
+ON DUPLICATE KEY UPDATE inventoryid=5400002, itemid=1702121, bagindex=11, 
+dateexpire='9999-01-01 00:00:01.000', invtype=1, `type`=0, iscash=1, quantity=1;
+-- USE
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000005, 5400003, 2070019, 10, '9999-01-01 00:00:01.000', 2, 1, 0, 31)
+ON DUPLICATE KEY UPDATE inventoryid=5400003, itemid=2070019, bagindex=10, 
+dateexpire='9999-01-01 00:00:01.000', invtype=2, `type`=1, iscash=0, quantity=31;
+-- Cash USE
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000006, 5400003, 2023177, 11, '9999-01-01 00:00:01.000', 2, 1, 1, 31)
+ON DUPLICATE KEY UPDATE inventoryid=5400003, itemid=2023177, bagindex=11, 
+dateexpire='9999-01-01 00:00:01.000', invtype=2, `type`=1, iscash=1, quantity=31;
+-- ETC
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000007, 5400004, 4031922, 10, '9999-01-01 00:00:01.000', 3, 1, 0, 3)
+ON DUPLICATE KEY UPDATE inventoryid=5400004, itemid=4031922, bagindex=10, 
+dateexpire='9999-01-01 00:00:01.000', invtype=3, `type`=1, iscash=0, quantity=3;
+-- SETUP
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000008, 5400005, 3015025, 10, '9999-01-01 00:00:01.000', 4, 1, 0, 1)
+ON DUPLICATE KEY UPDATE inventoryid=5400005, itemid=3015025, bagindex=10, 
+dateexpire='9999-01-01 00:00:01.000', invtype=4, `type`=1, iscash=0, quantity=1;
+-- CASH
+INSERT INTO items (id, inventoryid, itemid, bagindex, dateexpire, invtype, `type`, iscash, quantity)
+VALUES (90000009, 5400006, 5040004, 10, '9999-01-01 00:00:01.000', 5, 1, 1, 1)
+ON DUPLICATE KEY UPDATE inventoryid=5400006, itemid=5040004, bagindex=10, 
+dateexpire='9999-01-01 00:00:01.000', invtype=5, `type`=1, iscash=1, quantity=1;
