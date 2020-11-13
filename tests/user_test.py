@@ -68,6 +68,7 @@ def test_fetch_stat_by_column(user):
 def test_ban_reason_changes(user, before, expected):
 	user.ban_reason = expected
 	assert user.ban_reason == expected, f"Error encountered whilst setting ban reason: \nExpected: {expected} (String); Encountered: {user.ban_reason}, Type: {type(user.ban_reason)}"
+	user.ban_reason = before
 
 # User info setting tests
 @pytest.mark.parametrize("admin, intern, tester, player",[
