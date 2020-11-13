@@ -28,25 +28,26 @@ def inventory():
 	inventory = character.inventory
 	return inventory
 	
-def test_is_in_equip(inventory, iterations):
+def test_is_in_equip(inventory, item, iterations):
 	for n in range(iterations):
-		inventory.has_item_in_equip(1002140)
+		inventory.has_item_in_equip(item)
 
 # Define new mthod here for comparision:
 #def test_other_method(inventory, iterations):
 # 	for n in range(iterations):
 		# New method goes here
 
-def time_method(method, iterations):
+def time_method(method, item, iterations):
 	start = timer()
-	test_is_in_equip(inventory, iterations)
+	method(inventory, item, iterations)
 	end = timer()
 	return start, end
 
 inventory = inventory()
 iterations = 100000  # 100,000 iterations
+item = 1002140
 print(f"Attempting {iterations} iterations for better precision")
-start, end = time_method(test_is_in_equip, iterations)
+start, end = time_method(test_is_in_equip, item, iterations)
 print(f"Time taken: {end - start}seconds") # Time in seconds, e.g. 5.38091952400282
 
 # Uncomment the following for new method:
