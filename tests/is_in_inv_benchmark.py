@@ -38,10 +38,10 @@ def test_is_in_equip(inventory, iterations):
 		# New method goes here
 
 def time_method(method, iterations):
-  start = timer()
-  test_is_in_equip(inventory, iterations)
-  end = timer()
-  return start, end
+	start = timer()
+	test_is_in_equip(inventory, iterations)
+	end = timer()
+	return start, end
 
 inventory = inventory()
 iterations = 100000  # 100,000 iterations
