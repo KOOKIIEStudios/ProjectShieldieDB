@@ -19,6 +19,8 @@ View API Docs: [here](https://kookiiestudios.github.io/ProjectShieldieDB/).
 6. Use the command `py.test` to start automated unit tests.
 
 ## Progress
+Images for illustration purposes only.  
+Test numbers are reflective of the initial prototype and not of their current values.  
 
 Automated unit tests for Character handling checks completed:  
 ![](https://i.imgur.com/aXl4kch.png)  
