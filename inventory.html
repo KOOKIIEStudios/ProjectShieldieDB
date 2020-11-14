@@ -131,7 +131,7 @@ class Inventory:
             Boolean, representing whether the specified item was found
         &#34;&#34;&#34;
         for bag_index in inv_type:
-            if int(inv_type[bag_index][&#39;itemid&#39;]) == item_id:
+            if inv_type[bag_index][&#39;itemid&#39;] == item_id:
                 return True
         return False
 
@@ -411,7 +411,7 @@ this module offers NO inventory-write operations (only inventory-read operations
             Boolean, representing whether the specified item was found
         &#34;&#34;&#34;
         for bag_index in inv_type:
-            if int(inv_type[bag_index][&#39;itemid&#39;]) == item_id:
+            if inv_type[bag_index][&#39;itemid&#39;] == item_id:
                 return True
         return False
 
@@ -570,7 +570,7 @@ def has_item_in_inv_type(inv_type, item_id):
         Boolean, representing whether the specified item was found
     &#34;&#34;&#34;
     for bag_index in inv_type:
-        if int(inv_type[bag_index][&#39;itemid&#39;]) == item_id:
+        if inv_type[bag_index][&#39;itemid&#39;] == item_id:
             return True
     return False</code></pre>
 </details>
