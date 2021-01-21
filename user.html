@@ -75,6 +75,9 @@ class User:
         self._maple_points = 0
         self._nx_prepaid = 0
         self._account_type = 0
+        self._username = &#34;&#34;
+        self._password = &#34;&#34;
+        self._pic = &#34;&#34;
         self.init_user_stats()
 
     def init_user_stats(self):
@@ -91,6 +94,9 @@ class User:
         self._maple_points = self._user_stats[&#34;maplePoints&#34;]
         self._nx_prepaid = self._user_stats[&#34;nxPrepaid&#34;]
         self._account_type = self._user_stats[&#34;accounttype&#34;]
+        self._username = self._user_stats[&#34;name&#34;]
+        self._password = self._user_stats[&#34;password&#34;]
+        self._pic = self._user_stats[&#34;pic&#34;]
 
     @property
     def user_stats(self):
@@ -99,6 +105,28 @@ class User:
     @property
     def database_config(self):
         return self._database_config
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, x):
+        self._username = x
+        self.set_stat_by_column(&#34;name&#34;, x)
+
+    @property
+    def password(self):
+        return self._password
+
+    @property
+    def pic(self):
+        return self._pic
+
+    @pic.setter
+    def pic(self, x):
+        self._pic = x
+        self.set_stat_by_column(&#34;pic&#34;, x)
 
     @property
     def user_id(self):
@@ -389,6 +417,9 @@ This class contains the appropriate getter and setter methods for said attribute
         self._maple_points = 0
         self._nx_prepaid = 0
         self._account_type = 0
+        self._username = &#34;&#34;
+        self._password = &#34;&#34;
+        self._pic = &#34;&#34;
         self.init_user_stats()
 
     def init_user_stats(self):
@@ -405,6 +436,9 @@ This class contains the appropriate getter and setter methods for said attribute
         self._maple_points = self._user_stats[&#34;maplePoints&#34;]
         self._nx_prepaid = self._user_stats[&#34;nxPrepaid&#34;]
         self._account_type = self._user_stats[&#34;accounttype&#34;]
+        self._username = self._user_stats[&#34;name&#34;]
+        self._password = self._user_stats[&#34;password&#34;]
+        self._pic = self._user_stats[&#34;pic&#34;]
 
     @property
     def user_stats(self):
@@ -413,6 +447,28 @@ This class contains the appropriate getter and setter methods for said attribute
     @property
     def database_config(self):
         return self._database_config
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, x):
+        self._username = x
+        self.set_stat_by_column(&#34;name&#34;, x)
+
+    @property
+    def password(self):
+        return self._password
+
+    @property
+    def pic(self):
+        return self._pic
+
+    @pic.setter
+    def pic(self, x):
+        self._pic = x
+        self.set_stat_by_column(&#34;pic&#34;, x)
 
     @property
     def user_id(self):
@@ -692,6 +748,30 @@ def nx_prepaid(self):
     return self._nx_prepaid</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.user.User.password"><code class="name">var <span class="ident">password</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def password(self):
+    return self._password</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.user.User.pic"><code class="name">var <span class="ident">pic</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def pic(self):
+    return self._pic</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.user.User.user_id"><code class="name">var <span class="ident">user_id</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -714,6 +794,18 @@ def user_id(self):
 <pre><code class="python">@property
 def user_stats(self):
     return self._user_stats</code></pre>
+</details>
+</dd>
+<dt id="swordie_db.user.User.username"><code class="name">var <span class="ident">username</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def username(self):
+    return self._username</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.user.User.vote_points"><code class="name">var <span class="ident">vote_points</span></code></dt>
@@ -993,7 +1085,10 @@ the User object instance.</p></div>
     self._donation_points = self._user_stats[&#34;donationpoints&#34;]
     self._maple_points = self._user_stats[&#34;maplePoints&#34;]
     self._nx_prepaid = self._user_stats[&#34;nxPrepaid&#34;]
-    self._account_type = self._user_stats[&#34;accounttype&#34;]</code></pre>
+    self._account_type = self._user_stats[&#34;accounttype&#34;]
+    self._username = self._user_stats[&#34;name&#34;]
+    self._password = self._user_stats[&#34;password&#34;]
+    self._pic = self._user_stats[&#34;pic&#34;]</code></pre>
 </details>
 </dd>
 <dt id="swordie_db.user.User.is_admin"><code class="name flex">
@@ -1131,9 +1226,12 @@ Not recommended to use this alone, as it won't update the user object which this
 <li><code><a title="swordie_db.user.User.is_admin" href="#swordie_db.user.User.is_admin">is_admin</a></code></li>
 <li><code><a title="swordie_db.user.User.maple_points" href="#swordie_db.user.User.maple_points">maple_points</a></code></li>
 <li><code><a title="swordie_db.user.User.nx_prepaid" href="#swordie_db.user.User.nx_prepaid">nx_prepaid</a></code></li>
+<li><code><a title="swordie_db.user.User.password" href="#swordie_db.user.User.password">password</a></code></li>
+<li><code><a title="swordie_db.user.User.pic" href="#swordie_db.user.User.pic">pic</a></code></li>
 <li><code><a title="swordie_db.user.User.set_stat_by_column" href="#swordie_db.user.User.set_stat_by_column">set_stat_by_column</a></code></li>
 <li><code><a title="swordie_db.user.User.user_id" href="#swordie_db.user.User.user_id">user_id</a></code></li>
 <li><code><a title="swordie_db.user.User.user_stats" href="#swordie_db.user.User.user_stats">user_stats</a></code></li>
+<li><code><a title="swordie_db.user.User.username" href="#swordie_db.user.User.username">username</a></code></li>
 <li><code><a title="swordie_db.user.User.vote_points" href="#swordie_db.user.User.vote_points">vote_points</a></code></li>
 </ul>
 </li>

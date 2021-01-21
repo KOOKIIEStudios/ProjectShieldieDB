@@ -302,6 +302,11 @@ class Character:
         &#34;&#34;&#34;
         return JOBS[str(self.job)]
 
+    def get_gender_name(self):
+        if self._gender == 0:
+            return &#34;Male&#34;
+        return &#34;Female&#34;
+
     @property
     def name(self):
         return self._name
@@ -1093,6 +1098,11 @@ This class contains the appropriate getter and setter methods for said attribute
             String, representing the job name corresponding to a job ID
         &#34;&#34;&#34;
         return JOBS[str(self.job)]
+
+    def get_gender_name(self):
+        if self._gender == 0:
+            return &#34;Male&#34;
+        return &#34;Female&#34;
 
     @property
     def name(self):
@@ -2340,6 +2350,21 @@ def user(self):
     return url</code></pre>
 </details>
 </dd>
+<dt id="swordie_db.character.Character.get_gender_name"><code class="name flex">
+<span>def <span class="ident">get_gender_name</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_gender_name(self):
+    if self._gender == 0:
+        return &#34;Male&#34;
+    return &#34;Female&#34;</code></pre>
+</details>
+</dd>
 <dt id="swordie_db.character.Character.get_inventory_ids"><code class="name flex">
 <span>def <span class="ident">get_inventory_ids</span></span>(<span>self)</span>
 </code></dt>
@@ -2744,6 +2769,7 @@ Not recommended to use this alone, as it won't update the character object which
 <li><code><a title="swordie_db.character.Character.fame" href="#swordie_db.character.Character.fame">fame</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_char_img" href="#swordie_db.character.Character.get_char_img">get_char_img</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_db" href="#swordie_db.character.Character.get_db">get_db</a></code></li>
+<li><code><a title="swordie_db.character.Character.get_gender_name" href="#swordie_db.character.Character.get_gender_name">get_gender_name</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_inventory_ids" href="#swordie_db.character.Character.get_inventory_ids">get_inventory_ids</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_job_name" href="#swordie_db.character.Character.get_job_name">get_job_name</a></code></li>
 <li><code><a title="swordie_db.character.Character.get_primary_stats" href="#swordie_db.character.Character.get_primary_stats">get_primary_stats</a></code></li>
